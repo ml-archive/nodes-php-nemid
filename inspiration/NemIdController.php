@@ -3,9 +3,8 @@
 use App\Http\Controllers\Controller;
 use Nodes\NemId\Login\Errors\ErrorHandler;
 use Nodes\NemId\Login\Login as NemIdLogin;
-use Nodes\NemId\Model\Mode;
-use Nodes\NemId\UserCertificateCheck\TrustedRootDigests;
-use Nodes\NemId\UserCertificateCheck\UserCertificateCheck;
+use Nodes\NemId\Core\Mode;
+use Nodes\NemId\Login\CertificationCheck\CertificationCheck;
 
 class NemIdController extends Controller
 {
@@ -34,15 +33,15 @@ class NemIdController extends Controller
         // Decode response
         $response = base64_decode(\Input::get('response'));
 
-        if(!UserCertificateCheck::isXml($response)) {
+        if(!CertificationCheck::isXml($response)) {
             $error = ErrorHandler::getByCode($response);
 
             // Redirect with error $error->toJson()
         }
 
         // Check certificate
-        $userCertificate = new UserCertificateCheck();
-        $certificate = $userCertificate->checkAndReturnCertificate($response, TrustedRootDigests::get(), false);
+        $userCertificate = new CertificationCheck();
+        $certificate = $userCertificate->checkAndReturnCertificate($response);
 
         // Redirect with login info $certificate->getSubject()->toJson();
     }
