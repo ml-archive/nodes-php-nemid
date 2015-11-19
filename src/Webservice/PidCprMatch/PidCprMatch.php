@@ -3,7 +3,6 @@
 namespace Nodes\NemId\PidCprMatch;
 
 use GuzzleHttp\Client;
-use Nodes\Exception\Exception;
 use Nodes\NemId\PidCprMatch\Responses\Response;
 
 /**
@@ -23,7 +22,7 @@ class PidCprMatch
     /**
      * PidCprMatch constructor.
      *
-     * @param \Nodes\NemId\Model\Mode|null $mode
+     * @param \Nodes\NemId\Core\Mode|null $mode
      */
     public function __construct($mode = null)
     {
@@ -80,7 +79,7 @@ class PidCprMatch
             $params = [
                 'cert' => [
                     $this->settings->getCertificateAndKey(),
-                    $this->settings->getPrivateKeyPassword()
+                    $this->settings->getPassword()
                 ],
                 'form_params' => [
                     'PID_REQUEST' => $pidCprRequest
@@ -103,8 +102,7 @@ class PidCprMatch
 
             return new Response($status);
         } catch (\Exception $e) {
-            throw new \Exception($e->getTraceAsString());
-//            return new Response(-1, $e);
+            return new Response(-1, $e);
         }
 
     }

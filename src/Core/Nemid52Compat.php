@@ -5,10 +5,8 @@ namespace Nodes\NemId\Core;
 /**
  * Class Nemid52Compat
  *
- * @author cr@nodes.dk
- *
- * Original taken from https://code.google.com/p/nemid-php/
- *
+ * @author  cr@nodes.dk
+ *          Original taken from https://code.google.com/p/nemid-php/
  * @package Nodes\NemId\Core
  */
 class Nemid52Compat
@@ -57,7 +55,7 @@ class Nemid52Compat
     {
         // Init possible algorithms
         $algorithms = [
-            'sha1WithRSAEncryption'   => ['alg' => 'sha1', 'oid' => '1.3.14.3.2.26'],
+            'sha1WithRSAEncryption' => ['alg' => 'sha1', 'oid' => '1.3.14.3.2.26'],
             'sha256WithRSAEncryption' => ['alg' => 'sha256', 'oid' => '2.16.840.1.101.3.4.2.1'],
             'sha384WithRSAEncryption' => ['alg' => 'sha384', 'oid' => '2.16.840.1.101.3.4.2.2'],
             'sha512WithRSAEncryption' => ['alg' => 'sha512', 'oid' => '2.16.840.1.101.3.4.2.3'],
@@ -66,7 +64,7 @@ class Nemid52Compat
         // Returns an array with the key details
         $pInfo = openssl_pkey_get_details($keyId);
 
-        if(empty($algorithms[$signatureAlgorithmLong])) {
+        if (empty($algorithms[$signatureAlgorithmLong])) {
             throw new \Exception('Unsupported signature algorithm: ' . $signatureAlgorithmLong);
         }
 

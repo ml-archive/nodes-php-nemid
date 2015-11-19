@@ -1,12 +1,12 @@
 <?php
 
-namespace Nodes\NemId\UserCertificateCheck\Exception;
+namespace Nodes\NemId\Login\CertificationCheck\Exceptions;
 
 /**
  * Class InvalidSignatureException
  * @author  Casper Rasmussen <cr@nodes.dk>
  *
- * @package Nodes\NemId\UserCertificateCheck\Exception
+ * @package Nodes\NemId\Login\CertificationCheck\Exception
  */
 class InvalidSignatureException extends \Exception
 {

@@ -2,9 +2,22 @@
 
 namespace Nodes\NemId\Core;
 
+/**
+ * More or less 1:1 copy from WAYF Library
+ *
+ * Class X509Helper
+ * @author  Taken from the WAYF repo
+ *
+ * @package Nodes\NemId\Core
+ */
+class X509Helper extends Der
+{
 
-class X509Helper extends Der {
-
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @return array
+     * @throws \Exception
+     */
     public function generalName()
     {
         $tag = $this->peek();
@@ -21,19 +34,26 @@ class X509Helper extends Der {
             case 4:
                 $this->next(4);
                 $res['directoryName'] = $this->name();
-                $res['directoryName_'] = $this->nameasstring($res['directoryName']);
+                $res['directoryName_'] = $this->nameAsString($res['directoryName']);
                 break;
             case 6:
                 $res['uniformResourceIdentifier'] = $this->next(-22);
                 break;
             default:
                 throw new \Exception("Unsupported GeneralName: $tag");
-#                trigger_error("Unsupported GeneralName: $tag", E_USER_ERROR);
         }
+
         return $res;
     }
 
-    public function generalNames($tag = null) {
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param null $tag
+     * @return array
+     * @throws \Exception
+     */
+    public function generalNames($tag = null)
+    {
         $res = array();
         $this->beginsequence($tag);
         while ($this->in()) {
@@ -43,7 +63,12 @@ class X509Helper extends Der {
         return $res;
     }
 
-    public function nameasstring($name)
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param $name
+     * @return string
+     */
+    public function nameAsString($name)
     {
         $rdnd = '';
         $res = '';

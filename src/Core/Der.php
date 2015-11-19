@@ -3,24 +3,50 @@ namespace Nodes\NemId\Core;
 
 /**
  * Class Der
- * @author  Taken from the WAYF repo
  *
+ * @author  Taken from the WAYF repo
  * @package Nodes\NemId\Core
  */
-class Der extends Oids {
+class Der extends Oids
+{
+    /**
+     * @var
+     */
     protected $tag, $len, $value, $class, $constructed;
-    protected $buffer, $stack = array();
-    protected $i;
-    private $ignoredextensions = array(
-        'netscape-cert-type' => 1,
-    );
 
-    protected function init($der) {
+    /**
+     * @var array
+     */
+    protected $buffer, $stack = [];
+
+    /**
+     * @var
+     */
+    protected $i;
+
+    /**
+     * @var array
+     */
+    private $ignoredextensions = [
+        'netscape-cert-type' => 1,
+    ];
+
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param $der
+     */
+    protected function init($der)
+    {
         $this->buffer = $der;
         $this->i = 0;
     }
 
-    protected function dump($note = '') {
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param string $note
+     */
+    protected function dump($note = '')
+    {
         $z = strlen($this->buffer) - $this->i;
         print_r("$note\n");
         print_r("len: $z\n");
@@ -28,7 +54,12 @@ class Der extends Oids {
         print "\n";
     }
 
-    protected function pr($note = '') {
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param string $note
+     */
+    protected function pr($note = '')
+    {
         $savei = $this->i;
         $byte = ord($this->buffer[$this->i++]);
         $tag = $byte & 0x1f;
@@ -45,7 +76,12 @@ class Der extends Oids {
         print_r("---\n");
     }
 
-    private function tlv($expectedtag = null) {
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param null $expectedtag
+     */
+    private function tlv($expectedtag = null)
+    {
         $byte = ord($this->buffer[$this->i++]);
         $this->tag = $byte & 0x1f;
         if ($expectedtag < 0) $this->tag = $expectedtag = -$expectedtag;
@@ -59,6 +95,11 @@ class Der extends Oids {
         $this->len = $this->vallen();
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param null $expectedtag
+     * @return bool|int|null|string|void
+     */
     protected function next($expectedtag = null)
     {
         $this->tlv($expectedtag);
@@ -89,7 +130,14 @@ class Der extends Oids {
         }
     }
 
-    protected function der($expectedtag = null, $pass = false) {
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param null       $expectedtag
+     * @param bool|false $pass
+     * @return string
+     */
+    protected function der($expectedtag = null, $pass = false)
+    {
         $oldi = $this->i;
         $this->tlv($expectedtag);
         $i = $this->i;
@@ -101,11 +149,16 @@ class Der extends Oids {
         return substr($this->buffer, $oldi, $this->len + $i - $oldi);
     }
 
-    /*
-     * if provided with a tag and the tag is equal to the current tag
+    /**
+     * If provided with a tag and the tag is equal to the current tag
      * peek considers it EXPLICIT, consumes it and return true
+     *
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param null $tag
+     * @return bool|int|null
      */
-    protected function peek($tag = null) {
+    protected function peek($tag = null)
+    {
         $t = null;
         if ($this->i < end($this->stack)) $t = ord($this->buffer[$this->i]) & 0x1f;
         if ($tag !== null) {
@@ -119,6 +172,10 @@ class Der extends Oids {
         return $t;
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @return int
+     */
     protected function vallen()
     {
         $byte = ord($this->buffer[$this->i++]);
@@ -132,36 +189,65 @@ class Der extends Oids {
         return $res;
     }
 
-	protected function beginsequence($tag = 16) {
-	    $this->begin($tag);
-	}
-
-	protected function beginset($tag = 17) {
-	    $this->begin($tag);
-	}
-
-    protected function begin($tag) {
-	    $this->next($tag);
-	    array_push($this->stack, $this->i + $this->len);
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param int $tag
+     */
+    protected function beginsequence($tag = 16)
+    {
+        $this->begin($tag);
     }
 
-	protected function in() {
-	    return $this->i < end($this->stack);
-	}
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param int $tag
+     */
+    protected function beginset($tag = 17)
+    {
+        $this->begin($tag);
+    }
 
-	protected function end() {
-	    $end = array_pop($this->stack);
-	    if ($end != $this->i) trigger_error("sequence or set length does not match: $end != {$this->i}", E_USER_ERROR);
-	}
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param $tag
+     */
+    protected function begin($tag)
+    {
+        $this->next($tag);
+        array_push($this->stack, $this->i + $this->len);
+    }
 
-	protected function extensions() {
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @return bool
+     */
+    protected function in()
+    {
+        return $this->i < end($this->stack);
+    }
+
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     */
+    protected function end()
+    {
+        $end = array_pop($this->stack);
+        if ($end != $this->i) trigger_error("sequence or set length does not match: $end != {$this->i}", E_USER_ERROR);
+    }
+
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @return array
+     */
+    protected function extensions()
+    {
         $this->beginsequence();
         $extns = array();
-        while($this->in()) {
+        while ($this->in()) {
             $this->beginsequence();
-			$extnID = $this->oid();
-		    $theext['critical'] = $this->peek(1);
-			$theext['extnValue'] = $this->next(4);
+            $extnID = $this->oid();
+            $theext['critical'] = $this->peek(1);
+            $theext['extnValue'] = $this->next(4);
             try {
                 if (method_exists($this, $extnID)) {
                     $theext['extnValue'] = call_user_func(array($this, $extnID), $theext['extnValue']);
@@ -171,31 +257,40 @@ class Der extends Oids {
                     $theext['extnValue'] = chunk_split(bin2hex($theext['extnValue']), 2, ':');
                 }
             } catch (\Exception $e) {
-               $theext['extnValue'] = chunk_split(bin2hex($theext['extnValue']), 2, ':');
+                $theext['extnValue'] = chunk_split(bin2hex($theext['extnValue']), 2, ':');
             }
             $this->end();
-			$extns[$extnID] = $theext;
-		}
+            $extns[$extnID] = $theext;
+        }
         $this->end();
-		return $extns;
-	}
-
-    protected function signatureAlgorithm()
-    {
-   		$this->beginsequence();
-   		$salg = $this->oid();
-   		if ($this->in()) {
-   		    $this->next(); # alg param - ignore for now
-   		}
-        $this->end();
-   		return $salg;
+        return $extns;
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @return string
+     */
+    protected function signatureAlgorithm()
+    {
+        $this->beginsequence();
+        $salg = $this->oid();
+        if ($this->in()) {
+            $this->next(); # alg param - ignore for now
+        }
+        $this->end();
+        return $salg;
+    }
+
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param null $tag
+     * @return array
+     */
     protected function name($tag = null)
     {
-   		$this->beginsequence($tag);  # seq of RDN
+        $this->beginsequence($tag);  # seq of RDN
         $res = array();
-        while($this->in()) {
+        while ($this->in()) {
             $parts = array();
             $this->beginset(); # set of AttributeTypeAndValue
             while ($this->in()) {
@@ -210,6 +305,11 @@ class Der extends Oids {
         return $res;
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param int $tag
+     * @return string
+     */
     protected function oid($tag = 6)
     {
         $v = $this->oid_($this->next($tag));
@@ -219,6 +319,11 @@ class Der extends Oids {
         return $v;
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param $oid
+     * @return string
+     */
     protected function oid_($oid)
     {
         $len = strlen($oid);
@@ -228,13 +333,18 @@ class Der extends Oids {
             $x = ord($oid[$c]);
             $n = $n * 128 + ($x & 0x7f);
             if ($x <= 127) {
-                $v .= $v ? '.' . $n : ((int) ($n / 40) . '.' . ($n % 40));
+                $v .= $v ? '.' . $n : ((int)($n / 40) . '.' . ($n % 40));
                 $n = 0;
             }
         }
         return $v . '*';
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param null $tag
+     * @return bool|int|null|string|void
+     */
     protected function time($tag = null)
     {
         $time = $this->next($tag);
@@ -246,7 +356,13 @@ class Der extends Oids {
         return $time;
     }
 
-    protected function keyident($tag = 4) {
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param int $tag
+     * @return string
+     */
+    protected function keyident($tag = 4)
+    {
         return chunk_split(bin2hex($this->next($tag)), 2, ':');
     }
 }

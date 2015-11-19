@@ -1,26 +1,22 @@
 <?php
 namespace Nodes\NemId\Core;
+
 /**
- * Taken from the WAYF repo
+ * More or less 1:1 copy from WAYF Library
+ *
+ * Code in the end to retrieve oids
+ *
+ * Class Oids
+ *
+ * @author  Taken from the WAYF repo
+ * @package Nodes\NemId\Core
  */
-
-/*
-    Courtesy of Peter Gutmann pgut001@cs.auckland.ac.nz:
-
-    $src = 'http://www.cs.auckland.ac.nz/~pgut001/dumpasn1.cfg';
-
-    $f = fopen('http://www.cs.auckland.ac.nz/~pgut001/dumpasn1.cfg', 'r');
-    while ($line = fgets($f)) {
-    if (preg_match('/^OID = (.*)/', $line, $d)) {
-    if (@$oid) $recs[$oid] = $desc;
-    $oid = str_replace(' ', '.', $d[1]);
-    }
-    if (preg_match('/^Description = (.*)/', $line, $d)) $desc = $d[1];
-    }
-    var_export($recs);
- */
-class Oids {
-    public $oids = array (
+class Oids
+{
+    /**
+     * @var array
+     */
+    public $oids = [
         '0.2.262.1.10*' => 'Telesec',
         '0.2.262.1.10.0*' => 'extension',
         '0.2.262.1.10.1*' => 'mechanism',
@@ -1978,5 +1974,22 @@ class Oids {
         '2.16.756.1.89.1.2.1.1*' => 'SwissSign EV policy',
         '2.16.840.1.113733.1.7.48.1*' => 'Thawte EV policy',
         '2.16.840.1.114171.500.9*' => 'Wells Fargo EV policy',
-    );
+    ];
 }
+
+/*
+    Courtesy of Peter Gutmann pgut001@cs.auckland.ac.nz:
+
+    $src = 'http://www.cs.auckland.ac.nz/~pgut001/dumpasn1.cfg';
+
+    $f = fopen('http://www.cs.auckland.ac.nz/~pgut001/dumpasn1.cfg', 'r');
+    while ($line = fgets($f)) {
+    if (preg_match('/^OID = (.*)/', $line, $d)) {
+    if (@$oid) $recs[$oid] = $desc;
+    $oid = str_replace(' ', '.', $d[1]);
+    }
+    if (preg_match('/^Description = (.*)/', $line, $d)) $desc = $d[1];
+    }
+    var_export($recs);
+ */
+

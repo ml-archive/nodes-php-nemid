@@ -1,20 +1,21 @@
 <?php
 
-namespace Nodes\NemId\UserCertificateCheck;
+namespace Nodes\NemId\Login\CertificationCheck;
 
 use Nodes\NemId\Core\Nemid52Compat;
+use Nodes\NemId\Core\OCSP;
 use Nodes\NemId\Core\X509;
-use Nodes\NemId\UserCertificateCheck\Exception\InvalidCertificateException;
-use Nodes\NemId\UserCertificateCheck\Exception\InvalidSignatureException;
-use Nodes\NemId\UserCertificateCheck\Model\Certificate;
+use Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidCertificateException;
+use Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidSignatureException;
+use Nodes\NemId\Login\CertificationCheck\Models\Certificate;
 
 /**
  * Class UserCertificateCheck
  * @author  Casper Rasmussen <cr@nodes.dk>
  *
- * @package Nodes\NemId\UserCertificateCheck
+ * @package Nodes\NemId\Login\CertificationCheck
  */
-class UserCertificateCheck
+class CertificationCheck
 {
     /**
      * Constant for time format
@@ -53,13 +54,11 @@ class UserCertificateCheck
      *
      * @author Casper Rasmussen <cr@nodes.dk>
      * @param            $xml
-     * @param            $trustedRootDigest
-     * @param bool|false $checkOcsp
-     * @return \Nodes\NemId\UserCertificateCheck\Model\Certificate
-     * @throws \Nodes\NemId\UserCertificateCheck\Exception\InvalidCertificateException
-     * @throws \Nodes\NemId\UserCertificateCheck\Exception\InvalidSignatureException
+     * @return \Nodes\NemId\Login\CertificationCheck\Models\Certificate
+     * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidCertificateException
+     * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidSignatureException
      */
-    public function checkAndReturnCertificate($xml, $trustedRootDigest, $checkOcsp = false)
+    public function checkAndReturnCertificate($xml)
     {
         // Parse the xml
         $document = new \DOMDocument();
@@ -79,27 +78,22 @@ class UserCertificateCheck
         // Extract leaf certificate from chain
         $leafCertificate = end($certificateChain);
 
-        // Init path length
-        $nemIdFixedPathLength = 1; # as per RFC 5280: 'maximum number of non-self-issued intermediate certificates'
-
+        // Removed signature and certification check
+        // @TODO
         // Verify signature
-        $this->verifySignature($xp, $leafCertificate);
+        //$this->verifySignature($xp, $leafCertificate);
 
         // Verify certificate chain
-//        $this->simpleVerifyCertificateChain($certificateChain, array('digitalSignature'), $trustedRootDigest, $nemIdFixedPathLength);
+        $this->simpleVerifyCertificateChain($certificateChain);
 
         // Check ocsp
-        if ($checkOcsp) {
-            die('Not supported');
-            $this->checkOcsp($certificateChain, $x509);
-        }
-
+        $this->checkOcsp($certificateChain, $x509);
         return $leafCertificate;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
-     * @param \Nodes\NemId\UserCertificateCheck\Model\Certificate $certificate
+     * @param \Nodes\NemId\Login\CertificationCheck\Models\Certificate $certificate
      * @return string
      */
     private function certificateAsPem(Certificate $certificate)
@@ -115,7 +109,7 @@ class UserCertificateCheck
      * @param $signature
      * @param $signatureAlgorithm
      * @param $publicKeyPem
-     * @throws \Nodes\NemId\UserCertificateCheck\Exception\InvalidSignatureException
+     * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidSignatureException
      */
     protected function verifyRSASignature($data, $signature, $signatureAlgorithm, $publicKeyPem)
     {
@@ -128,9 +122,21 @@ class UserCertificateCheck
         }
     }
 
-
-    protected function simpleVerifyCertificateChain(array $certificateChain, $keyUsages, $trustedRootDigest, $maxPathLength)
+    /**
+     * Verify certificate chain
+     *
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param array $certificateChain
+     * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidCertificateException
+     * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidSignatureException
+     */
+    protected function simpleVerifyCertificateChain(array $certificateChain)
     {
+        // Init variable
+        $keyUsages = array('digitalSignature');
+        $maxPathLength = 1; # as per RFC 5280: 'maximum number of non-self-issued intermediate certificates'
+        $now = gmdate(self::GENERALIZED_TIME_FORMAT);
+
         // Check length
         if(sizeof($certificateChain) != ($maxPathLength + 2)) {
             throw new InvalidCertificateException('Length of certificate chain is not ' . $maxPathLength);
@@ -143,9 +149,6 @@ class UserCertificateCheck
                 throw new InvalidCertificateException('Certificate has not keyUsage: ' . $usage);
             }
         }
-
-        // Generate timestamp in format
-        $now = gmdate(self::GENERALIZED_TIME_FORMAT);
 
         // Loop over chain
         for ($i = $leaf; $i > 0; $i--) {
@@ -183,7 +186,7 @@ class UserCertificateCheck
         # first digest is for the root ...
         # check the root digest against a list of known root oces certificates
         $digest = hash('sha256', $certificateChain[0]->getCertificateDer());
-        if(!in_array($digest, array_values($trustedRootDigest))) {
+        if(!in_array($digest, array_values(config('nemid.login.certificationDigests')))) {
             throw new InvalidCertificateException('Certificate chain not signed by any trustedroots');
         }
     }
@@ -193,8 +196,8 @@ class UserCertificateCheck
      *
      * @author Casper Rasmussen <cr@nodes.dk>
      * @param \DomXPath                                           $xp
-     * @param \Nodes\NemId\UserCertificateCheck\Model\Certificate $certificate
-     * @throws \Nodes\NemId\UserCertificateCheck\Exception\InvalidSignatureException
+     * @param \Nodes\NemId\Login\CertificationCheck\Models\Certificate $certificate
+     * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidSignatureException
      */
     protected function verifySignature(\DomXPath $xp, Certificate $certificate)
     {
@@ -207,81 +210,130 @@ class UserCertificateCheck
         $signatureValue = base64_decode($xp->query('ds:SignatureValue', $context)->item(0)->textContent);
         $publicKey = openssl_get_publickey($this->certificateAsPem($certificate));
 
-        $hash = hash('sha256', $signedElement, true);
+        // Check digest
+        if(hash('sha256', $signedElement, true) != $digestValue) {
+            throw new InvalidSignatureException('Digest did not match signed element');
+        }
 
-        if (!(($hash == $digestValue) && openssl_verify($signedInfo, $signatureValue, $publicKey, 'sha256WithRSAEncryption') == 1)) {
-            throw new InvalidSignatureException();
+        // Check open ssl
+        if (openssl_verify($signedInfo, $signatureValue, $publicKey, 'sha256WithRSAEncryption') != 1) {
+            throw new InvalidSignatureException('Open ssl was not verified');
         }
     }
 
     /**
      * Does the ocsp check of the last certificate in the $certificateChain
      * $certificateChain contains root + intermediate + user certs
+     *
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param array                  $certificateChain
+     * @param \Nodes\NemId\Core\X509 $x509
+     * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidCertificateException
+     * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidSignatureException
      */
-    protected function checkOcsp($certificateChain, $x509)
+    protected function checkOcsp(array $certificateChain, X509 $x509)
     {
-        $certificate = array_pop($certificateChain); # the cert we are checking
-        $issuer = array_pop($certificateChain); # assumed to be the issuer of the signing certificate of the ocsp response as well
-        $ocspclient = new OCSP();
+        // the cert we are checking
+        $certificate = array_pop($certificateChain);
 
-        $certID = $ocspclient->certOcspID(array(
-            'issuerName' => $issuer['tbsCertificate']['subject_der'],
+        // assumed to be the issuer of the signing certificate of the ocsp response as well
+        $issuer = array_pop($certificateChain);
+        $ocspClient = new OCSP();
 
-            #remember to skip the first byte it is the number of unused bits and it is always 0 for keys and certificates
-            'issuerKey' => substr($issuer['tbsCertificate']['subjectPublicKeyInfo']['subjectPublicKey'], 1),
-            'serialNumber' => $certificate['tbsCertificate']['serialNumber']));
+        $certID = $ocspClient->certOcspID([
+            'issuerName' => $issuer->getTbsCertificate()['subject_der'],
+            //remember to skip the first byte it is the number of unused bits and it is always 0 for keys and certificates
+            'issuerKey' => substr($issuer->getTbsCertificate()['subjectPublicKeyInfo']['subjectPublicKey'], 1),
+            'serialNumber' => $certificate->getTbsCertificate()['serialNumber']
+        ]);
 
-        $ocspreq = $ocspclient->request(array($certID));
+        $ocsPreq = $ocspClient->request([$certID]);
 
-        $url = $certificate['tbsCertificate']['extensions']['authorityInfoAccess']['extnValue']['ocsp'][0]['accessLocation']['uniformResourceIdentifier'];
+        $url = $certificate->getTbsCertificate()['extensions']['authorityInfoAccess']['extnValue']['ocsp'][0]['accessLocation']['uniformResourceIdentifier'];
 
         $stream_options = array(
             'http' => array(
                 'ignore_errors' => false,
                 'method' => 'POST',
                 'header' => 'Content-type: application/ocsp-request' . "\r\n",
-                'content' => $ocspreq,
+                'content' => $ocsPreq,
                 'timeout' => 5,
             ),
         );
 
         $context = stream_context_create($stream_options);
-        $derresponse = file_get_contents($url, null, $context);
+        $derResponse = file_get_contents($url, null, $context);
 
-        $ocspresponse = $ocspclient->response($derresponse);
+        $ocspResponse = $ocspClient->response($derResponse);
 
-        /* check that the response was signed with the accompanying certificate */
-        $der = $ocspresponse['responseBytes']['BasicOCSPResponse']['tbsResponseData_der'];
-        # skip first null byte - the unused number bits in the end ...
-        $signature = substr($ocspresponse['responseBytes']['BasicOCSPResponse']['signature'], 1);
-        $signatureAlgorithm = $ocspresponse['responseBytes']['BasicOCSPResponse']['signatureAlgorithm'];
+        // Check that the response was signed with the accompanying certificate
+        $der = $ocspResponse['responseBytes']['BasicOCSPResponse']['tbsResponseData_der'];
 
-        $ocspcertificate = $ocspresponse['responseBytes']['BasicOCSPResponse']['certs'][0];
+        // Skip first null byte - the unused number bits in the end ...
+        $signature = substr($ocspResponse['responseBytes']['BasicOCSPResponse']['signature'], 1);
+        $signatureAlgorithm = $ocspResponse['responseBytes']['BasicOCSPResponse']['signatureAlgorithm'];
 
-        $this->verifyRSASignature($der, $signature, $signatureAlgorithm, $this->certificateAsPem($ocspcertificate));
+        $ocspCertificate = new Certificate($ocspResponse['responseBytes']['BasicOCSPResponse']['certs'][0]);
 
-        /* check that the accompanying certificate was signed with the intermediate certificate */
-        $der = $ocspcertificate['tbsCertificate']['tbsCertificate_der'];
-        $signature = substr($ocspcertificate['signature'], 1);
+        $this->verifyRSASignature($der, $signature, $signatureAlgorithm, $this->certificateAsPem($ocspCertificate));
 
-        $this->verifyRSASignature($der, $signature, $ocspcertificate['signatureAlgorithm'], $this->certificateAsPem($issuer));
+        // Check that the accompanying certificate was signed with the intermediate certificate
+        $der = $ocspCertificate->getTbsCertificate()['tbsCertificate_der'];
+        $signature = substr($ocspCertificate->getSignature(), 1);
 
-        $resp = $ocspresponse['responseBytes']['BasicOCSPResponse']['tbsResponseData']['responses'][0];
+        $this->verifyRSASignature($der, $signature, $ocspCertificate->getSignatureAlgorithm(), $this->certificateAsPem($issuer));
 
-        $ocspresponse['responseStatus'] === 'successful' or trigger_error("OCSP Response Status not 'successful'", E_USER_ERROR);
-        $resp['certStatus'] === 'good' or trigger_error("OCSP Revocation status is not 'good'", E_USER_ERROR);
-        $resp['certID']['hashAlgorithm'] === 'sha-256'
-        && $resp['certID']['issuerNameHash'] === $certID['issuerNameHash']
-        && $resp['certID']['issuerKeyHash'] === $certID['issuerKeyHash']
-        && $resp['certID']['serialNumber'] === $certID['serialNumber']
-        or trigger_error("OCSP Revocation, mismatch between original and checked certificate", E_USER_ERROR);
+        $response = $ocspResponse['responseBytes']['BasicOCSPResponse']['tbsResponseData']['responses'][0];
+
+        // Check OCSP response
+        if($ocspResponse['responseStatus'] !== 'successful') {
+            throw new InvalidCertificateException('OCSP Response Status not successful');
+        }
+
+        // Check certificate status
+        if($response['certStatus'] !== 'good') {
+            throw new InvalidCertificateException('OCSP Revocation status is not good');
+        }
+
+        // Check hash algorithm
+        if($response['certID']['hashAlgorithm'] !== 'sha-256') {
+            throw new InvalidCertificateException('Hash algorithm is not correct');
+        }
+
+        // Check hash name
+        if($response['certID']['issuerNameHash'] !== $certID['issuerNameHash']) {
+            throw new InvalidCertificateException('Name hash is not correct');
+        }
+
+        // Check key hash
+        if($response['certID']['issuerKeyHash'] !== $certID['issuerKeyHash']) {
+            throw new InvalidCertificateException('Key hash is not correct');
+        }
+
+        // Check serial number
+        if($response['certID']['serialNumber'] !== $certID['serialNumber']) {
+            throw new InvalidCertificateException('Serial number is not correct');
+        }
+
+        // Init time
         $now = gmdate(self::GENERALIZED_TIME_FORMAT);
-        $resp['thisUpdate'] <= $now && $now <= $resp['nextupdate']
-        or trigger_error("OCSP Revocation status not current: {$returnedCertResponse['thisUpdate']} <= $now <= {$returnedCertResponse['nextupdate']}", E_USER_ERROR);
 
-        $ocspcertificateextns = $ocspcertificate['tbsCertificate']['extensions'];
-        $ocspcertificateextns['extKeyUsage']['extnValue']['ocspSigning'] or trigger_error('ocspcertificate is not for ocspSigning', E_USER_ERROR);
-        $ocspcertificateextns['ocspNoCheck']['extnValue'] === null or trigger_error('ocspcertificate has not ocspNoCheck extension', E_USER_ERROR);
+        // Check OCSP revocation status
+        if($response['thisUpdate'] >= $now && $now <= $response['nextupdate']) {
+            throw new InvalidCertificateException('OCSP Revocation status not current');
+        }
+
+        $ocspCertificateExtensions = $ocspCertificate->getTbsCertificate()['extensions'];
+
+        // Check ocsp signing
+        if(!$ocspCertificateExtensions['extKeyUsage']['extnValue']['ocspSigning']) {
+            throw new InvalidCertificateException('ocspcertificate is not for ocspSigning');
+        }
+
+        // Check extension
+        if($ocspCertificateExtensions['ocspNoCheck']['extnValue'] !== null) {
+            throw new InvalidCertificateException('ocspcertificate has not ocspNoCheck extension');
+        }
     }
 
     /**

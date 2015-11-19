@@ -1,34 +1,24 @@
 <?php
 
-namespace Nodes\NemId\UserCertificateCheck\Model;
+namespace Nodes\NemId\Login\CertificationCheck\Models;
 
 /**
  * Class Certificate
- *
  * @author  Casper Rasmussen <cr@nodes.dk>
- * @package Nodes\NemId\UserCertificateCheck\Model
+ *
+ * @package Nodes\NemId\Login\CertificationCheck\Models
  */
 class Certificate
 {
     /**
      * @var string
      */
-    protected $certificateDer;
+    protected $certificateDer, $signature, $signatureAlgorithm;
 
     /**
      * @var array
      */
     protected $tbsCertificate;
-
-    /**
-     * @var string
-     */
-    protected $signatureAlgorithm;
-
-    /**
-     * @var string
-     */
-    protected $signature;
 
     /**
      * Certificate constructor.
@@ -95,7 +85,7 @@ class Certificate
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
-     * @return \Nodes\NemId\UserCertificateCheck\Model\Subject
+     * @return \Nodes\NemId\Login\CertificationCheck\Models\Subject
      */
     public function getSubject()
     {

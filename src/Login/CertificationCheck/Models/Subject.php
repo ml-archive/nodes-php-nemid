@@ -1,23 +1,19 @@
 <?php
+
+namespace Nodes\NemId\Login\CertificationCheck\Models;
+
 /**
- * Author: cr@nodes.dk
- * Date: 18/11/15
+ * Class Subject
+ * @author  Casper Rasmussen <cr@nodes.dk>
+ *
+ * @package Nodes\NemId\Login\CertificationCheck\Models
  */
-
-namespace Nodes\NemId\UserCertificateCheck\Model;
-
-
 class Subject
 {
     /**
      * @var string
      */
-    protected $name;
-
-    /**
-     * @var string
-     */
-    protected $pid;
+    protected $name, $pid;
 
     /**
      * Subject constructor.

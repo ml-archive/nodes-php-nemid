@@ -1,5 +1,5 @@
 <?php
-namespace Nodes\NemId;
+namespace Nodes\NemId\Core;
 
 /**
  * Class Mode
@@ -35,7 +35,7 @@ class Mode
      */
     public function __construct($isTest = null)
     {
-        if(!is_null($isTest)) {
+        if (!is_null($isTest)) {
             $this->setTestMode($isTest);
         }
     }
@@ -90,7 +90,8 @@ class Mode
      * @author Casper Rasmussen <cr@nodes.dk>
      * @return bool
      */
-    public function isTest() {
+    public function isTest()
+    {
         return $this->mode == $this->test;
     }
 

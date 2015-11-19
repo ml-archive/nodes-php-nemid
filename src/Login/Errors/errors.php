@@ -164,20 +164,4 @@ return [
         'code'        => 'cancelsign',
         'danish'        => 'Du har afbrudt signering.',
     ],
-    //'certificate'      => [
-    //    'VALID'         => 'Gyldig',
-    //    'code'          => 'certificate',
-    //    'INVALID'       => 'Ugyldigt',
-    //    'NOT_YET_VALID' => 'Ikke gyldigt endnu',
-    //    'EXPIRED'       => 'Udl\\u00f8bet',
-    //    'REVOKED'       => 'Sp\\u00e6rret',
-    //],
-    //'certificateTypes' => [
-    //    'poces'   => 'personligt certifikat',
-    //    'code'    => 'certificateTypes',
-    //    'moces'   => 'medarbejdercertifikat',
-    //    'voces'   => 'virksomhedscertifikat',
-    //    'foces'   => 'funktionscertifikat',
-    //    'unknown' => 'ukendt',
-    //],
 ];

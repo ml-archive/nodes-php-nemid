@@ -1,10 +1,25 @@
 <?php
 namespace Nodes\NemId\Core;
 
-class X509 extends Der {
+/**
+ * More or less 1:1 copy from WAYF Library
+ *
+ * Class X509
+ *
+ * @author  Taken from the WAYF repo
+ * @package Nodes\NemId\Core
+ */
+class X509 extends Der
+{
+    /**
+     * @var \Nodes\NemId\Core\X509Helper
+     */
     protected $xtns;
 
-    protected $keyUsages = array(
+    /**
+     * @var array
+     */
+    protected $keyUsages = [
         'digitalSignature',
         'contentCommitment',
         'keyEncipherment',
@@ -14,46 +29,65 @@ class X509 extends Der {
         'cRLSign',
         'encipherOnly',
         'decipherOnly'
-    );
+    ];
 
-    public function __construct() {
+    /**
+     * X509 constructor.
+     */
+    public function __construct()
+    {
         $this->xtns = new X509Helper();;
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param $der
+     * @return array
+     */
     public function certificate($der)
     {
         $this->init($der);
+
         return $this->certificate_do();
     }
 
-    protected function certificate_do() {
-        $cert['certificate_der']        = $this->der(); # inclusive signatureAlgorithm and signature
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @return array
+     */
+    protected function certificate_do()
+    {
+        $cert['certificate_der'] = $this->der(); # inclusive signatureAlgorithm and signature
         $this->beginsequence();
-        $cert['tbsCertificate']         = $this->tbsCertificate();
-        $cert['signatureAlgorithm']     = $this->signatureAlgorithm();
-        $cert['signature']              = $this->next(3);
+        $cert['tbsCertificate'] = $this->tbsCertificate();
+        $cert['signatureAlgorithm'] = $this->signatureAlgorithm();
+        $cert['signature'] = $this->next(3);
         $this->end();
         return $cert;
-        #print_r($cert);
+
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @return array
+     */
     protected function tbsCertificate()
     {
         $res['tbsCertificate_der'] = $this->der();
         $this->beginsequence();
-        $res['version']             = 0;
+        $res['version'] = 0;
         if ($this->peek(0)) {
-            $res['version']         = $this->next(2);
+            $res['version'] = $this->next(2);
         }
-        $res['serialNumber']        = $this->next(2);
-        $res['signature']           = $this->signatureAlgorithm();
-        $res['issuer_der']          = $this->der();
-        $res['issuer']              = $this->name();
-        $res['issuer_']             = $this->xtns->nameasstring($res['issuer']);
-        $res['validity']            = $this->validity();
-        $res['subject_der']         = $this->der();
-        $res['subject']             = $this->name();
-        $res['subject_']            = $this->xtns->nameasstring($res['subject']);
+        $res['serialNumber'] = $this->next(2);
+        $res['signature'] = $this->signatureAlgorithm();
+        $res['issuer_der'] = $this->der();
+        $res['issuer'] = $this->name();
+        $res['issuer_'] = $this->xtns->nameAsString($res['issuer']);
+        $res['validity'] = $this->validity();
+        $res['subject_der'] = $this->der();
+        $res['subject'] = $this->name();
+        $res['subject_'] = $this->xtns->nameAsString($res['subject']);
         $this->beginsequence();
         $res['subjectPublicKeyInfo']['algorithm'] = $this->signatureAlgorithm();
         $res['subjectPublicKeyInfo']['subjectPublicKey'] = $this->next(3);
@@ -68,17 +102,28 @@ class X509 extends Der {
             $res['extensions'] = $this->extensions();
         }
         $this->end();
+
         return $res;
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @return array
+     */
     protected function validity()
     {
         $this->beginsequence();
-        $res =  array('notBefore' => $this->time(), 'notAfter' => $this->time());
+        $res = array('notBefore' => $this->time(), 'notAfter' => $this->time());
         $this->end();
+
         return $res;
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param $der
+     * @return array
+     */
     protected function keyUsage($der)
     {
         $this->xtns->init($der);
@@ -101,23 +146,36 @@ class X509 extends Der {
         return $res;
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param $der
+     * @return array
+     * @throws \Exception
+     */
     protected function authorityInfoAccess($der)
     {
         $this->xtns->init($der);
         $this->xtns->beginsequence();
+
+        $res = [];
         while ($this->xtns->in()) {
             $this->xtns->beginsequence();
             $accessMethod = $this->xtns->oid();
-            $res[$accessMethod][] = array(
+            $res[$accessMethod][] = [
                 #'accessMethod' => $accessMethod,
-                'accessLocation' => $this->xtns->generalName(),
-            );
+                'accessLocation' => $this->xtns->generalName()
+            ];
             $this->xtns->end();
         }
         $this->xtns->end();
         return $res;
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param $der
+     * @return array
+     */
     protected function certificatePolicies($der)
     {
         $this->xtns->init($der);
@@ -142,7 +200,7 @@ class X509 extends Der {
                             $this->xtns->beginsequence();
                             $policyQualifier['UserNotice']['noticeRef']['organisation'] = $this->xtns->next();
                             $this->xtns->beginsequence();
-                            while($this->xtns->in()) {
+                            while ($this->xtns->in()) {
                                 $policyQualifier['UserNotice']['noticeRef']['noticeNumbers'][] = $this->xtns->next(2);
                             }
                             $this->xtns->end();
@@ -166,6 +224,11 @@ class X509 extends Der {
         return $res;
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param $der
+     * @return array
+     */
     protected function cRLDistributionPoints($der)
     {
         $this->xtns->init($der);
@@ -195,8 +258,14 @@ class X509 extends Der {
         return $crldps;
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param $der
+     * @return array
+     */
     protected function authorityKeyIdentifier($der)
     {
+        $res = [];
         $this->xtns->init($der);
         $this->xtns->beginsequence();
         if ($this->xtns->peek() == 0) {
@@ -212,13 +281,24 @@ class X509 extends Der {
         return $res;
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param $der
+     * @return array
+     */
     protected function subjectKeyIdentifier($der)
     {
         $this->xtns->init($der);
         $res['keyIdentifier'] = chunk_split(bin2hex($this->xtns->next(4)), 2, ':');
+
         return $res;
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param $der
+     * @return array
+     */
     protected function basicConstraints($der)
     {
         $res['cA'] = false;
@@ -233,6 +313,11 @@ class X509 extends Der {
         return $res;
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param $der
+     * @return array
+     */
     protected function extKeyUsage($der)
     {
         $this->xtns->init($der);
@@ -244,6 +329,12 @@ class X509 extends Der {
         return $res;
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param $der
+     * @return array
+     * @throws \Exception
+     */
     protected function subjectAltName($der)
     {
         $this->xtns->init($der);
@@ -255,6 +346,11 @@ class X509 extends Der {
         return $res;
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param $der
+     * @return array
+     */
     protected function privateKeyUsagePeriod($der)
     {
         $this->xtns->init($der);
@@ -269,6 +365,11 @@ class X509 extends Der {
         return $res;
     }
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param $der
+     * @return bool|int|null|string
+     */
     protected function ocspNoCheck($der)
     {
         $this->xtns->init($der);
@@ -277,6 +378,11 @@ class X509 extends Der {
 
     # RFC 2313 p. 15 ...
 
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @param $der
+     * @return array
+     */
     public function RSASignatureValue($der)
     {
         $this->xtns->init($der);

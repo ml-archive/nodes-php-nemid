@@ -1,7 +1,7 @@
 <?php
 
 namespace Nodes\NemId\Login;
-use Nodes\NemId\Mode;
+use Nodes\NemId\Core\Mode;
 
 /**
  * Class Settings

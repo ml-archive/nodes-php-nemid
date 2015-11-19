@@ -15,17 +15,12 @@ class Login
     /**
      * @var string
      */
-    protected $iFrameUrl;
-
-    /**
-     * @var string
-     */
-    protected $params;
+    protected $iFrameUrl, $params;
 
     /**
      * Login constructor.
      *
-     * @param \Nodes\NemId\Model\Mode|null $mode
+     * @param \Nodes\NemId\Mode|null $mode
      */
     public function __construct($mode = null)
     {

@@ -29,7 +29,7 @@ class Settings
     /**
      * @var string
      */
-    protected $privateKeyPassword;
+    protected $password;
 
     /**
      * @var string
@@ -44,12 +44,12 @@ class Settings
     /**
      * Settings constructor.
      *
-     * @param \Nodes\NemId\Model\Mode|null $mode
+     * @param \Nodes\NemId\Core\Mode|null $mode
      */
     public function __construct($mode = null)
     {
         // Retrieve settings
-        $this->settings = require_once dirname(__FILE__) . '/settings/settings.php';
+        $this->settings = config('nemid');
 
         // Decide on mode and key in settings
         if ($mode->isFromSettings()) {
@@ -61,12 +61,12 @@ class Settings
         $key = $this->isTest ? 'testSettings' : 'settings';
 
         // Subtract settings for mode
-        $settings = $this->settings[$key];
+        $settings = $this->settings['webservice'][$key];
 
         // Init variables
         $this->server = $settings['server'];
         $this->certificateAndKey = $settings['certificateAndKey'];
-        $this->privateKeyPassword = $settings['privateKeyPassword'];
+        $this->password = $settings['password'];
         $this->serviceId = $settings['serviceId'];
         $this->proxy = $settings['proxy'];
     }
@@ -84,9 +84,9 @@ class Settings
      * @author Casper Rasmussen <cr@nodes.dk>
      * @return string
      */
-    public function getPrivateKeyPassword()
+    public function getPassword()
     {
-        return $this->privateKeyPassword;
+        return $this->password;
     }
 
     /**

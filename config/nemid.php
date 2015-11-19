@@ -10,7 +10,6 @@ return [
             'privateKeyPassword'  => '',
             'privateKeyLocation'  => 'privateKey.pem',
             'certificateLocation' => 'publicCert.pem',
-            'certificationDigest' => '',
         ],
         'testSettings' => [
             'baseUrl'             => 'https://appletk.danid.dk/',
@@ -20,7 +19,8 @@ return [
             'privateKeyPassword'  => '',
             'privateKeyLocation'  => 'testPrivateKey.pem',
             'certificateLocation' => 'testPublicCert.pem',
-            'certificationDigest' => '',
+        ],
+        'certificationDigests' => [
         ]
     ],
     'webservice' => [
