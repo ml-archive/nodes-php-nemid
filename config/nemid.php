@@ -1,42 +1,62 @@
 <?php
 return [
+    /*
+    |--------------------------------------------------------------------------
+    | Test
+    |--------------------------------------------------------------------------
+    | Default setting for test or production mode
+    */
     'test' => false,
+    /*
+    |--------------------------------------------------------------------------
+    | Login settings for Nem-Id
+    |--------------------------------------------------------------------------
+    |
+    */
     'login' => [
         'settings'     => [
-            'baseUrl'             => 'https://applet.danid.dk/',
+            'baseUrl'             => 'https://applet.danid.dk/', // Official url for production
             'uiMode'              => 'std',
             'origin'              => false,// Can be domain where iframe is hosted
-            'showCancelBtn'       => true,
-            'privateKeyPassword'  => '',
-            'privateKeyLocation'  => 'privateKey.pem',
-            'certificateLocation' => 'publicCert.pem',
+            'showCancelBtn'       => true, // Show the cancel button in the iframe
+            'privateKeyPassword'  => '', // Password for the private key
+            'privateKeyLocation'  => 'privateKey.pem', // Location for private key
+            'certificateLocation' => 'publicCert.pem', // Location for public certificate
         ],
         'testSettings' => [
-            'baseUrl'             => 'https://appletk.danid.dk/',
+            'baseUrl'             => 'https://appletk.danid.dk/', // Official url for testing environment
             'uiMode'              => 'std',
             'origin'              => false,// Can be domain where iframe is hosted
-            'showCancelBtn'       => true,
-            'privateKeyPassword'  => '',
-            'privateKeyLocation'  => 'testPrivateKey.pem',
-            'certificateLocation' => 'testPublicCert.pem',
+            'showCancelBtn'       => true, // Show the cancel button in the iframe
+            'privateKeyPassword'  => '', // Password for the private key
+            'privateKeyLocation'  => 'testPrivateKey.pem', // Location for private key
+            'certificateLocation' => 'testPublicCert.pem', // Location for public certificate
         ],
+
+        // Check for certificate matching yours after login
         'certificationDigests' => [
         ]
     ],
+    /*
+    |--------------------------------------------------------------------------
+    | Webservice settings Nem-Id
+    |--------------------------------------------------------------------------
+    |
+    */
     'webservice' => [
         'settings' => [
-            'server' => 'https://pidws.certifikat.dk/pid_serviceprovider_server/pidxml/',
-            'certificateAndKey' => 'certificatePrivateKey.pem',
-            'password' => '',
-            'serviceId' => '',
-            'proxy' => false
+            'server' => 'https://pidws.certifikat.dk/pid_serviceprovider_server/pidxml/', // Official url for production
+            'certificateAndKey' => 'certificatePrivateKey.pem', // Location for certificateAndPrivateKey
+            'password' => '', // Password for certificateAndPrivateKey
+            'serviceId' => '', // ServiceId also called SPID
+            'proxy' => false // Since you only have 10 ip whitelisted, it can be smart to proxy the ip calls
         ],
         'testSettings' => [
-            'server' => 'https://pidws.pp.certifikat.dk/pid_serviceprovider_server/pidxml/',
-            'certificateAndKey' => 'testCertificatePrivateKey.pem',
-            'password' => '',
-            'serviceId' => '',
-            'proxy' => false
+            'server' => 'https://pidws.pp.certifikat.dk/pid_serviceprovider_server/pidxml/', // Official url for testing environment
+            'certificateAndKey' => 'testCertificatePrivateKey.pem', // Location for certificateAndPrivateKey
+            'password' => '', // Password for certificateAndPrivateKey
+            'serviceId' => '', // ServiceId also called SPID
+            'proxy' => false // Since you only have 10 ip whitelisted, it can be smart to proxy the ip calls
         ]
     ]
 ];
