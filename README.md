@@ -8,25 +8,26 @@ Since there is no official PHP library for Nem-id
   - Checking the returned signature and the certificate chain
   - Matching PID to CPR
     
-### This is a rewrite of an original library for an older version of the applet in java
-### Original library can be found: https://code.google.com/p/nemid-php/ 
+This is a rewrite of an original library for an older version of the applet in java
+Original library can be found: https://code.google.com/p/nemid-php/ 
     
 # Installation
 
 So you got your p12 certificate now generate pem files, use following commands: 
 
-###publicCertificate:
-`openssl pkcs12 -in path.p12 -out newfile.crt.pem -clcerts -nokeys`
+#####publicCertificate:
+`openssl pkcs12 -in path.p12 -out certificate.pem -clcerts -nokeys`
 
-###privateKey & privateKeyPassword
-`openssl pkcs12 -in cert.p12 -clcerts -out cert.pem`
+#####privateKey & privateKeyPassword
+`openssl pkcs12 -in path.p12 -clcerts -out privateKey.pem`
 
-###certifateAndPrivateKey & password (For PID/CPR match)
-`openssl pkcs12 -in path.p12 -out newfile.key.pem -nocerts -nodes`     
+#####certifateAndPrivateKey & password (For PID/CPR match)
+`openssl pkcs12 -in path.p12 -out certicateAndPrivateKey.pem -nocerts -nodes`     
 
 Now you have all the certificates needed 
 
-### Copy the config file to htdocs and fill settings
+##### Copy the config file to htdocs and fill settings
 
+Enjoy
 
 
