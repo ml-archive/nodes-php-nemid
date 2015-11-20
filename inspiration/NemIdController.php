@@ -40,9 +40,15 @@ class NemIdController extends Controller
         }
 
         // Check certificate
-        $userCertificate = new CertificationCheck();
-        $certificate = $userCertificate->checkAndReturnCertificate($response);
+        try {
+            $userCertificate = new CertificationCheck();
+            $certificate = $userCertificate->checkAndReturnCertificate($response);
+        } catch (\Exception $e) {
+            // Error with validation of certificate chain or signature
 
+        }
+
+        // Successfully
         // Redirect with login info $certificate->getSubject()->toJson();
     }
 }

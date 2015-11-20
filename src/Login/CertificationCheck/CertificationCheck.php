@@ -78,10 +78,8 @@ class CertificationCheck
         // Extract leaf certificate from chain
         $leafCertificate = end($certificateChain);
 
-        // Removed signature and certification check
-        // @TODO
         // Verify signature
-        //$this->verifySignature($xp, $leafCertificate);
+        #$this->verifySignature($xp, $leafCertificate);
 
         // Verify certificate chain
         $this->simpleVerifyCertificateChain($certificateChain);
