@@ -3,7 +3,6 @@
 use App\Http\Controllers\Controller;
 use Nodes\NemId\Login\Errors\ErrorHandler;
 use Nodes\NemId\Login\Login as NemIdLogin;
-use Nodes\NemId\Core\Mode;
 use Nodes\NemId\Login\CertificationCheck\CertificationCheck;
 
 class NemIdController extends Controller
@@ -17,7 +16,7 @@ class NemIdController extends Controller
      */
     public function view()
     {
-        $nemIdLogin = new NemIdLogin(new Mode(NemIdTest::isTest()));
+        $nemIdLogin = new NemIdLogin();
 
         return view('applet', compact('nemIdLogin'));
     }
