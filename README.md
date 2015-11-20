@@ -4,8 +4,9 @@ A PHP Laravel library for using the Danish NemID for authenticating a user.
  
 ### The library supports: 
   - Preparing the parameters for the applet
-  - Checking the returned signature and the certificate chain
-  - Matching PID to CPR
+  - Validate the returned signature and the certificate chain
+  - Extract Name and PID
+  - Matching PID to CPR SOAP webservice
     
 This is a rewrite of an original library for an older version of the applet in java
 Original library can be found: https://code.google.com/p/nemid-php/ 
