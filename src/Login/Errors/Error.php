@@ -76,14 +76,22 @@ class Error
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
-     * @return string
+     * @return array
      */
-    public function toJson() {
-        return json_encode([
+    public function toArray() {
+        return [
             'code' => $this->code,
             'danish' => $this->danish,
             'english' => $this->english
-        ]);
+        ];
+    }
+
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @return string
+     */
+    public function toJson() {
+        return json_encode($this->toArray());
     }
 
 }

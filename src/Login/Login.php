@@ -20,12 +20,12 @@ class Login
     /**
      * Login constructor.
      *
-     * @param \Nodes\NemId\Mode|null $mode
+     * @param \Nodes\NemId\Core\Mode|null $mode
      */
     public function __construct($mode = null)
     {
         $this->settings = new Settings($mode);
-        $this->timeStamp = (int) round(microtime(true) * 1000);
+        $this->timeStamp = (int)round(microtime(true) * 1000);
 
         $this->generateIFrameUrl();
         $this->generateParams();
@@ -55,18 +55,18 @@ class Login
 
         // Init start params
         $params = [
-            "SP_CERT"    => $certificate,
+            "SP_CERT" => $certificate,
             "CLIENTFLOW" => "Oceslogin2",
-            "TIMESTAMP"  => $this->timeStamp,
+            "TIMESTAMP" => $this->timeStamp,
         ];
 
         // Add origin if set
-        if($this->settings->hasOrigin()) {
+        if ($this->settings->hasOrigin()) {
             $params['ORIGIN'] = $this->settings->getOrigin();
         }
 
         // Remove cancel btn if set
-        if(!$this->settings->showCancelBtn()) {
+        if (!$this->settings->showCancelBtn()) {
             $params['DO_NOT_SHOW_CANCEL'] = 'TRUE';
         }
 
@@ -125,5 +125,14 @@ class Login
     public function getBaseUrl()
     {
         return $this->settings->getBaseUrl();
+    }
+
+    /**
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @return \Nodes\NemId\Login\Settings
+     */
+    public function getSettings()
+    {
+        return $this->settings;
     }
 }

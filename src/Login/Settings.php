@@ -41,7 +41,7 @@ class Settings
     /**
      * Settings constructor.
      *
-     * @param \Nodes\NemId\Mode|null $mode
+     * @param \Nodes\NemId\Core\Mode|null $mode
      * @throws \Exception
      */
     public function __construct($mode = null)
