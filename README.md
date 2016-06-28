@@ -13,6 +13,11 @@ Original library can be found: https://code.google.com/p/nemid-php/
     
 # Installation
 
+####Make sure you have bcmath installed
+```
+sudo apt-get install php7.0-bcmath
+```
+
 You got your p12 certificate now generate pem files, use following commands: 
 
 #####publicCertificate:
