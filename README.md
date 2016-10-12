@@ -75,7 +75,11 @@ Initialize a PidCprMatch object and call the function with pid and cpr params.
 A response object will be returned. The object has functions to to check match and possible errors
 
 `$response->didMatch();`
-         
+
+### Misc
+
+ - The name `Pseudonym` or `Pseudonym Pseudonym` will be used for version 1 of nemid users, which have not set their name afterwards
+
 Enjoy
  
 
