@@ -33,10 +33,11 @@ return [
             'certificateLocation' => 'testPublicCert.pem', // Location for public certificate
         ],
 
-        // Check for certificate matching yours after login
+        // Check for certificate matching after login
         'certificationDigests' => [
         ],
         'proxy' => false // Since you only have 10 ip whitelisted, it can be smart to proxy the ip calls
+
     ],
     /*
     |--------------------------------------------------------------------------
