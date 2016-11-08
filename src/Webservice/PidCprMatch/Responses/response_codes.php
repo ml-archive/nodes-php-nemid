@@ -12,7 +12,7 @@ return [
     1 => [
         'short'   => 'NO_MATCH',
         'danish'  => 'CPR svarer ikke til PID',
-        'english' => 'CPR does not match PID)',
+        'english' => 'CPR does not match PID',
     ],
     2 => [
         'short' => 'NO_PID',

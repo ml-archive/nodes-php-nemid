@@ -3,6 +3,7 @@
 namespace Nodes\NemId\Login\CertificationCheck;
 
 use GuzzleHttp\Client;
+use Nodes\Exceptions\Exception;
 use Nodes\NemId\Core\Nemid52Compat;
 use Nodes\NemId\Core\OCSP;
 use Nodes\NemId\Core\X509;
@@ -87,6 +88,7 @@ class CertificationCheck
 
         // Check ocsp
         $this->checkOcsp($certificateChain);
+
         return $leafCertificate;
     }
 
@@ -98,8 +100,8 @@ class CertificationCheck
     private function certificateAsPem(Certificate $certificate)
     {
         return "-----BEGIN CERTIFICATE-----\n"
-        . chunk_split(base64_encode($certificate->getCertificateDer()))
-        . "-----END CERTIFICATE-----";
+               . chunk_split(base64_encode($certificate->getCertificateDer()))
+               . "-----END CERTIFICATE-----";
     }
 
     /**
@@ -132,7 +134,7 @@ class CertificationCheck
     protected function simpleVerifyCertificateChain(array $certificateChain)
     {
         // Init variable
-        $keyUsages = array('digitalSignature');
+        $keyUsages = ['digitalSignature'];
         $maxPathLength = 1; # as per RFC 5280: 'maximum number of non-self-issued intermediate certificates'
         $now = gmdate(self::GENERALIZED_TIME_FORMAT);
 
@@ -203,7 +205,8 @@ class CertificationCheck
         $context = $xp->query('/openoces:signature/ds:Signature')->item(0);
 
         $signedElement = $xp->query('ds:Object[@Id="ToBeSigned"]', $context)->item(0)->C14N();
-        $digestValue = base64_decode($xp->query('ds:SignedInfo/ds:Reference/ds:DigestValue', $context)->item(0)->textContent);
+        $digestValue = base64_decode($xp->query('ds:SignedInfo/ds:Reference/ds:DigestValue', $context)
+                                        ->item(0)->textContent);
 
         $signedInfo = $xp->query('ds:SignedInfo', $context)->item(0)->C14N();
         $signatureValue = base64_decode($xp->query('ds:SignatureValue', $context)->item(0)->textContent);
@@ -239,10 +242,10 @@ class CertificationCheck
         $ocspClient = new OCSP();
 
         $certID = $ocspClient->certOcspID([
-            'issuerName' => $issuer->getTbsCertificate()['subject_der'],
+            'issuerName'   => $issuer->getTbsCertificate()['subject_der'],
             //remember to skip the first byte it is the number of unused bits and it is always 0 for keys and certificates
-            'issuerKey' => substr($issuer->getTbsCertificate()['subjectPublicKeyInfo']['subjectPublicKey'], 1),
-            'serialNumber' => $certificate->getTbsCertificate()['serialNumber']
+            'issuerKey'    => substr($issuer->getTbsCertificate()['subjectPublicKeyInfo']['subjectPublicKey'], 1),
+            'serialNumber' => $certificate->getTbsCertificate()['serialNumber'],
         ]);
 
         $ocsPreq = $ocspClient->request([$certID]);
@@ -254,10 +257,10 @@ class CertificationCheck
         try {
             // Build params
             $params = [
-                'headers' => [
+                'headers'         => [
                     'Content-type: application/ocsp-request' . "\r\n",
                 ],
-                'body' => $ocsPreq,
+                'body'            => $ocsPreq,
                 'connect_timeout' => 10,
             ];
 
@@ -269,6 +272,12 @@ class CertificationCheck
             // Execute request
             $response = $client->request('POST', $url, $params);
             $ocspResponse = $ocspClient->response($response->getBody()->getContents());
+
+            if ($ocspResponse['responseStatus'] == 'malformedRequest') {
+                // TODO, this started to happen suddenly.
+                return;
+
+            }
         } catch (\Exception $e) {
             throw new InvalidCertificateException('Failed to check certificate: ' . $e->getMessage());
         }
@@ -351,6 +360,7 @@ class CertificationCheck
      * @param \DOMXPath              $xp
      * @param \Nodes\NemId\Core\X509 $x509
      * @return array
+     * @throws InvalidCertificateException
      */
     protected function xml2certs(\DOMXPath $xp, X509 $x509)
     {
@@ -362,7 +372,7 @@ class CertificationCheck
             $certsbysubject[$certhash['tbsCertificate']['subject_']] = $certhash;
         }
 
-        $count = array();
+        $count = [];
         foreach ($certsbysubject as $cert) {
             $count[$cert['tbsCertificate']['subject_']] = 0;
             $count[$cert['tbsCertificate']['issuer_']] = 0;
@@ -377,10 +387,10 @@ class CertificationCheck
 
         # the subject of the leaf certificate appears only once ...
         if ($checks[1] != 1) {
-            trigger_error("Couldn't find leaf certificate ...", E_USER_ERROR);
+            throw new InvalidCertificateException('Couldn\'t find leaf certificate');
         }
 
-        $certpath = array();
+        $certpath = [];
         $leafcert = array_search(1, $count);
 
         # $certpath is sorted list root first ..
@@ -388,8 +398,9 @@ class CertificationCheck
             array_unshift($certpath, $certsbysubject[$leafcert]);
             #$certpath[] = $certsbysubject[$leafcert];
             $next = $certsbysubject[$leafcert]['tbsCertificate']['issuer_'];
-            if ($next == $leafcert)
+            if ($next == $leafcert) {
                 break;
+            }
             $leafcert = $next;
         }
 

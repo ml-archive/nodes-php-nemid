@@ -23,7 +23,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Nodes\\NemId": "src/"
+            "Nodes\\NemId\\": "src/"
         },
         "files": [
         ]

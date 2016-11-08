@@ -102,6 +102,7 @@ class PidCprMatch
 
             return new Response($status);
         } catch (\Exception $e) {
+            bugsnag_report($e);
             return new Response(-1, $e);
         }
 
