@@ -3,7 +3,6 @@
 namespace Nodes\NemId\Login\CertificationCheck;
 
 use GuzzleHttp\Client;
-use Nodes\Exceptions\Exception;
 use Nodes\NemId\Core\Nemid52Compat;
 use Nodes\NemId\Core\OCSP;
 use Nodes\NemId\Core\X509;
@@ -87,7 +86,9 @@ class CertificationCheck
         $this->simpleVerifyCertificateChain($certificateChain);
 
         // Check ocsp
-        $this->checkOcsp($certificateChain);
+        if(config('nodes.nemid.login.checkOcsp')) {
+            $this->checkOcsp($certificateChain);
+        }
 
         return $leafCertificate;
     }
@@ -273,11 +274,8 @@ class CertificationCheck
             $response = $client->request('POST', $url, $params);
             $ocspResponse = $ocspClient->response($response->getBody()->getContents());
 
-            if ($ocspResponse['responseStatus'] == 'malformedRequest') {
-                // TODO, this started to happen suddenly.
-                return;
-
-            }
+            // TODO, in php seven responseStatus is malformed
+            // $ocspResponse['responseStatus'] == 'malformedRequest'
         } catch (\Exception $e) {
             throw new InvalidCertificateException('Failed to check certificate: ' . $e->getMessage());
         }
