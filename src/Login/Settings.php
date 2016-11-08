@@ -52,7 +52,7 @@ class Settings
         }
 
         // Retrieve settings
-        $this->settings = config('nemid');
+        $this->settings = config('nodes.nemid');
 
         if(!$this->settings) {
             throw new \Exception('Missing config');

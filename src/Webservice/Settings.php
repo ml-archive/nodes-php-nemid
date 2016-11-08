@@ -49,7 +49,7 @@ class Settings
     public function __construct($mode = null)
     {
         // Retrieve settings
-        $this->settings = config('nemid');
+        $this->settings = config('nodes.nemid');
 
         // Decide on mode and key in settings
         if ($mode->isFromSettings()) {

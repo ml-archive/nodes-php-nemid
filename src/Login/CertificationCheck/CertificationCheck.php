@@ -188,7 +188,7 @@ class CertificationCheck
         # first digest is for the root ...
         # check the root digest against a list of known root oces certificates
         $digest = hash('sha256', $certificateChain[0]->getCertificateDer());
-        if (!in_array($digest, array_values(config('nemid.login.certificationDigests')))) {
+        if (!in_array($digest, array_values(config('nodes.nemid.login.certificationDigests')))) {
             throw new InvalidCertificateException('Certificate chain not signed by any trustedroots');
         }
     }
@@ -267,7 +267,7 @@ class CertificationCheck
 
             // Set proxy
             if (config('nemid.login.proxy')) {
-                $params['proxy'] = config('nemid.login.proxy');
+                $params['proxy'] = config('nodes.nemid.login.proxy');
             }
 
             // Execute request
