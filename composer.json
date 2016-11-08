@@ -1,0 +1,31 @@
+{
+    "name": "nodes/nemid",
+    "description": "Nemid package for php",
+    "keywords": [
+        "nodes",
+        "nemid",
+        "nem-id",
+        "nem id",
+        "php",
+        "laravel"
+    ],
+    "license": "MIT",
+    "homepage": "http://nodesagency.com",
+    "authors": [
+        {
+            "name": "Casper Rasmussen",
+            "email": "cr@nodes.dk",
+            "role": "CTO"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "~6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nodes\\NemId": "src/"
+        },
+        "files": [
+        ]
+    }
+}
