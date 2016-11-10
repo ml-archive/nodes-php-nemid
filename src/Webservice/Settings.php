@@ -42,14 +42,19 @@ class Settings
     protected $proxy;
 
     /**
-     * Settings constructor.
+     * Settings constructor
      *
-     * @param \Nodes\NemId\Core\Mode|null $mode
+     * @author Casper Rasmussen <cr@nodes.dk>
+     *
+     * @access public
+     *
+     * @param array $settings
+     * @param null  $mode
      */
-    public function __construct($mode = null)
+    public function __construct(array $settings, $mode = null)
     {
         // Retrieve settings
-        $this->settings = config('nemid');
+        $this->settings = $settings;
 
         // Decide on mode and key in settings
         if ($mode->isFromSettings()) {

@@ -3,7 +3,6 @@
 namespace Nodes\NemId\Login\CertificationCheck;
 
 use GuzzleHttp\Client;
-use Nodes\Exceptions\Exception;
 use Nodes\NemId\Core\Nemid52Compat;
 use Nodes\NemId\Core\OCSP;
 use Nodes\NemId\Core\X509;
@@ -23,6 +22,16 @@ class CertificationCheck
      * Constant for time format
      */
     const GENERALIZED_TIME_FORMAT = 'YmdHis\Z';
+
+    /**
+     * @var array
+     */
+    protected $settings;
+
+    public function __construct(array $settings)
+    {
+        $this->settings = $settings;
+    }
 
     /**
      * Validates xml string
@@ -87,7 +96,9 @@ class CertificationCheck
         $this->simpleVerifyCertificateChain($certificateChain);
 
         // Check ocsp
-        $this->checkOcsp($certificateChain);
+        if($this->settings['login']['checkOcsp']) {
+            $this->checkOcsp($certificateChain);
+        }
 
         return $leafCertificate;
     }
@@ -187,7 +198,7 @@ class CertificationCheck
         # first digest is for the root ...
         # check the root digest against a list of known root oces certificates
         $digest = hash('sha256', $certificateChain[0]->getCertificateDer());
-        if (!in_array($digest, array_values(config('nemid.login.certificationDigests')))) {
+        if (!in_array($digest, array_values($this->settings['login']['certificationDigests']))) {
             throw new InvalidCertificateException('Certificate chain not signed by any trustedroots');
         }
     }
@@ -265,19 +276,16 @@ class CertificationCheck
             ];
 
             // Set proxy
-            if (config('nemid.login.proxy')) {
-                $params['proxy'] = config('nemid.login.proxy');
+            if ($proxy = $this->settings['nemid']['login']['proxy']) {
+                $params['proxy'] = $proxy;
             }
 
             // Execute request
             $response = $client->request('POST', $url, $params);
             $ocspResponse = $ocspClient->response($response->getBody()->getContents());
 
-            if ($ocspResponse['responseStatus'] == 'malformedRequest') {
-                // TODO, this started to happen suddenly.
-                return;
-
-            }
+            // TODO, in php 7 responseStatus is malformed
+            // $ocspResponse['responseStatus'] == 'malformedRequest'
         } catch (\Exception $e) {
             throw new InvalidCertificateException('Failed to check certificate: ' . $e->getMessage());
         }

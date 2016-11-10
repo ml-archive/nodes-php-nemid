@@ -16,7 +16,7 @@ class NemIdController extends Controller
      */
     public function view()
     {
-        $nemIdLogin = new NemIdLogin();
+        $nemIdLogin = new NemIdLogin(config('nodes.nemid'));
 
         return view('applet', compact('nemIdLogin'));
     }
@@ -40,7 +40,7 @@ class NemIdController extends Controller
 
         // Check certificate
         try {
-            $userCertificate = new CertificationCheck();
+            $userCertificate = new CertificationCheck(config('nodes.nemid'));
             $certificate = $userCertificate->checkAndReturnCertificate($response);
         } catch (\Exception $e) {
             // Error with validation of certificate chain or signature
