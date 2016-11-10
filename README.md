@@ -3,6 +3,8 @@
 A PHP Laravel library for using the Danish NemID for authenticating a user.
 
 I'm sure it can be used easily without laravel also. Feel free to contribute to improvements
+
+![image](https://cloud.githubusercontent.com/assets/1279756/20196240/18e4a2b8-a79a-11e6-832b-36933da588e3.png)
  
 ### The library supports: 
   - Preparing the parameters for the applet
