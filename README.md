@@ -11,7 +11,27 @@ A PHP Laravel library for using the Danish NemID for authenticating a user.
 This is a rewrite of an original library for an older version of the applet in java
 Original library can be found: https://code.google.com/p/nemid-php/ 
     
-# Installation
+## 🔧 Setup
+
+Setup service provider in `config/app.php`
+
+```php
+Nodes\Nemid\ServiceProvider::class
+```
+
+Publish config files
+
+```bash
+php artisan vendor:publish --provider="Nodes\NemId\ServiceProvider"
+```
+
+If you want to overwrite any existing config files use the `--force` parameter
+
+```bash
+php artisan vendor:publish --provider="Nodes\NemId\ServiceProvider" --force
+```
+
+## Certificates
 
 ####Make sure you have bcmath installed
 ```
@@ -39,7 +59,7 @@ In the inspiration folder an example of how you can setup the login flow can be 
 
 First prepare parameters to inject into the iframe. By creating a Login object.
 
-`$login = new Login();`
+`$login = new Login(config('nodes.nemid'));`
 
 Setup a html document with the iframe url, js with param data and a form for callbacks
 
@@ -57,7 +77,7 @@ The submitted data is base64 encoded, besides that all errors comes as string wh
 
 Now validate the certificates and extract name and PID from it by initialize a CertificationCheck object
 
-`$userCertificate = new CertificationCheck();`
+`$userCertificate = new CertificationCheck(config('nodes.nemid'));`
 
 `$certificate = $userCertificate->checkAndReturnCertificate($response);`
 
@@ -68,7 +88,7 @@ Now validate the certificates and extract name and PID from it by initialize a C
 #PID/CPR match integration
 Initialize a PidCprMatch object and call the function with pid and cpr params.
 
-`$pidCprMatch = new PidCprMatch();`
+`$pidCprMatch = new PidCprMatch(config('nodes.nemid'));`
 
 `$response = $pidCprMatch->pidCprRequest($pid, $cpr);`
 
