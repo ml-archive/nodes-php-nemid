@@ -17,7 +17,7 @@ return [
     'login' => [
         'settings'     => [
             'baseUrl'             => 'https://applet.danid.dk/', // Official url for production
-            'uiMode'              => 'std',
+            'uiMode'              => 'lmt', // lmt / std
             'origin'              => false, // Can be domain where iframe is hosted
             'showCancelBtn'       => true, // Show the cancel button in the iframe
             'privateKeyPassword'  => '', // Password for the private key
@@ -26,7 +26,7 @@ return [
         ],
         'testSettings' => [
             'baseUrl'             => 'https://appletk.danid.dk/', // Official url for testing environment
-            'uiMode'              => 'std',
+            'uiMode'              => 'lmt', // lmt / std
             'origin'              => false, // Can be domain where iframe is hosted
             'showCancelBtn'       => true, // Show the cancel button in the iframe
             'privateKeyPassword'  => '', // Password for the private key
