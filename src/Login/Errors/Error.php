@@ -1,15 +1,14 @@
 <?php
+
 namespace Nodes\NemId\Login\Errors;
 
 /**
- * Class Error
- * @author Casper Rasmussen <cr@nodes.dk>
+ * Class Error.
  *
- * @package Nodes\NemId\Login\Errors
+ * @author Casper Rasmussen <cr@nodes.dk>
  */
 class Error
 {
-
     /**
      * @var string
      */
@@ -34,6 +33,7 @@ class Error
      * - danish
      *
      * @param array $error
+     *
      * @throws \Exception
      */
     public function __construct(array $error)
@@ -49,6 +49,7 @@ class Error
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getCode()
@@ -58,6 +59,7 @@ class Error
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getEnglishDescription()
@@ -67,6 +69,7 @@ class Error
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getDanishDescription()
@@ -76,22 +79,25 @@ class Error
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return array
      */
-    public function toArray() {
+    public function toArray()
+    {
         return [
-            'code' => $this->code,
-            'danish' => $this->danish,
-            'english' => $this->english
+            'code'    => $this->code,
+            'danish'  => $this->danish,
+            'english' => $this->english,
         ];
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
-    public function toJson() {
+    public function toJson()
+    {
         return json_encode($this->toArray());
     }
-
 }

@@ -3,10 +3,9 @@
 namespace Nodes\NemId\Login\CertificationCheck\Exceptions;
 
 /**
- * Class InvalidCertificateException
- * @author  Casper Rasmussen <cr@nodes.dk>
+ * Class InvalidCertificateException.
  *
- * @package Nodes\NemId\Login\CertificationCheck\Exception
+ * @author  Casper Rasmussen <cr@nodes.dk>
  */
 class InvalidCertificateException extends \Exception
 {

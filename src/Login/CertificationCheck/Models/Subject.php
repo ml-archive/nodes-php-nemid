@@ -3,17 +3,17 @@
 namespace Nodes\NemId\Login\CertificationCheck\Models;
 
 /**
- * Class Subject
- * @author  Casper Rasmussen <cr@nodes.dk>
+ * Class Subject.
  *
- * @package Nodes\NemId\Login\CertificationCheck\Models
+ * @author  Casper Rasmussen <cr@nodes.dk>
  */
 class Subject
 {
     /**
      * @var string
      */
-    protected $name, $pid;
+    protected $name;
+    protected $pid;
 
     /**
      * Subject constructor.
@@ -28,6 +28,7 @@ class Subject
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getName()
@@ -37,6 +38,7 @@ class Subject
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getPid()
@@ -46,20 +48,24 @@ class Subject
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return array
      */
-    public function toArray() {
+    public function toArray()
+    {
         return [
             'name' => $this->getName(),
-            'pid' => $this->getPid()
+            'pid'  => $this->getPid(),
         ];
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
-    public function toJson() {
+    public function toJson()
+    {
         return json_encode($this->toArray());
     }
 }

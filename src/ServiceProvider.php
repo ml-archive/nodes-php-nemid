@@ -5,9 +5,7 @@ namespace Nodes\NemId;
 use Illuminate\Support\ServiceProvider as IlluminateServiceProvider;
 
 /**
- * Class ServiceProvider
- *
- * @package Nodes\ServiceAuthenticator
+ * Class ServiceProvider.
  */
 class ServiceProvider extends IlluminateServiceProvider
 {
@@ -31,6 +29,5 @@ class ServiceProvider extends IlluminateServiceProvider
      */
     public function register()
     {
-
     }
 }

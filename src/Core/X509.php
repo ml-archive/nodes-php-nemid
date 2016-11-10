@@ -1,13 +1,13 @@
 <?php
+
 namespace Nodes\NemId\Core;
 
 /**
- * More or less 1:1 copy from WAYF Library
+ * More or less 1:1 copy from WAYF Library.
  *
  * Class X509
  *
  * @author  Taken from the WAYF repo
- * @package Nodes\NemId\Core
  */
 class X509 extends Der
 {
@@ -28,7 +28,7 @@ class X509 extends Der
         'keyCertSign',
         'cRLSign',
         'encipherOnly',
-        'decipherOnly'
+        'decipherOnly',
     ];
 
     /**
@@ -36,12 +36,14 @@ class X509 extends Der
      */
     public function __construct()
     {
-        $this->xtns = new X509Helper();;
+        $this->xtns = new X509Helper();
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $der
+     *
      * @return array
      */
     public function certificate($der)
@@ -53,22 +55,24 @@ class X509 extends Der
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return array
      */
     protected function certificate_do()
     {
-        $cert['certificate_der'] = $this->der(); # inclusive signatureAlgorithm and signature
+        $cert['certificate_der'] = $this->der(); // inclusive signatureAlgorithm and signature
         $this->beginsequence();
         $cert['tbsCertificate'] = $this->tbsCertificate();
         $cert['signatureAlgorithm'] = $this->signatureAlgorithm();
         $cert['signature'] = $this->next(3);
         $this->end();
-        return $cert;
 
+        return $cert;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return array
      */
     protected function tbsCertificate()
@@ -92,10 +96,10 @@ class X509 extends Der
         $res['subjectPublicKeyInfo']['algorithm'] = $this->signatureAlgorithm();
         $res['subjectPublicKeyInfo']['subjectPublicKey'] = $this->next(3);
         $this->end();
-        if ($this->peek() == 1) { # issuerUniqueID IMPLICIT
+        if ($this->peek() == 1) { // issuerUniqueID IMPLICIT
             $this->next(1);
         }
-        if ($this->peek() == 2) { #subjectUniqueID IMPLICIT
+        if ($this->peek() == 2) { //subjectUniqueID IMPLICIT
             $this->next(1);
         }
         if ($this->peek(3)) {
@@ -108,12 +112,13 @@ class X509 extends Der
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return array
      */
     protected function validity()
     {
         $this->beginsequence();
-        $res = array('notBefore' => $this->time(), 'notAfter' => $this->time());
+        $res = ['notBefore' => $this->time(), 'notAfter' => $this->time()];
         $this->end();
 
         return $res;
@@ -121,7 +126,9 @@ class X509 extends Der
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $der
+     *
      * @return array
      */
     protected function keyUsage($der)
@@ -136,21 +143,26 @@ class X509 extends Der
          */
 
         $unusedbits = ord(substr($bitstring, 0, 1));
-        $ku = base_convert(bin2hex(chr(1) . substr($bitstring, 1)), 16, 2);
+        $ku = base_convert(bin2hex(chr(1).substr($bitstring, 1)), 16, 2);
         $ku = substr($ku, 1, -$unusedbits);
-        $res = array();
+        $res = [];
         for ($c = 0; $c < strlen($ku); $c++) {
-            if ($ku[$c])
+            if ($ku[$c]) {
                 $res[$this->keyUsages[$c]] = 1;
+            }
         }
+
         return $res;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $der
-     * @return array
+     *
      * @throws \Exception
+     *
+     * @return array
      */
     protected function authorityInfoAccess($der)
     {
@@ -162,25 +174,28 @@ class X509 extends Der
             $this->xtns->beginsequence();
             $accessMethod = $this->xtns->oid();
             $res[$accessMethod][] = [
-                #'accessMethod' => $accessMethod,
-                'accessLocation' => $this->xtns->generalName()
+                //'accessMethod' => $accessMethod,
+                'accessLocation' => $this->xtns->generalName(),
             ];
             $this->xtns->end();
         }
         $this->xtns->end();
+
         return $res;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $der
+     *
      * @return array
      */
     protected function certificatePolicies($der)
     {
         $this->xtns->init($der);
 
-        $res = array();
+        $res = [];
         $this->xtns->beginsequence();
         while ($this->xtns->in()) {
             $this->xtns->beginsequence();
@@ -189,7 +204,7 @@ class X509 extends Der
                 $this->xtns->beginsequence();
                 while ($this->xtns->in()) {
                     $this->xtns->beginsequence();
-                    $policyQualifier = array();
+                    $policyQualifier = [];
                     $policyQualifierId = $this->xtns->oid();
                     $policyQualifier['policyQualifierId'] = $policyQualifierId;
                     if ($policyQualifierId == 'cps') {
@@ -221,12 +236,15 @@ class X509 extends Der
             $res[] = $PolicyInformation;
         }
         $this->xtns->end();
+
         return $res;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $der
+     *
      * @return array
      */
     protected function cRLDistributionPoints($der)
@@ -234,7 +252,7 @@ class X509 extends Der
         $this->xtns->init($der);
         $this->xtns->beginsequence();
         while ($this->xtns->in()) {
-            $res = array();
+            $res = [];
             $this->xtns->beginsequence();
             if ($this->xtns->peek(0)) {
                 if ($this->xtns->peek() == 0) {
@@ -243,24 +261,26 @@ class X509 extends Der
                 if ($this->xtns->peek() == 1) {
                     $res['distributionPoint']['nameRelativeToCRLIssuer'][] = $this->xtns->name(1);
                 }
-            };
+            }
             if ($this->xtns->peek() == 1) {
                 $res['reasons'] = $this->xtns->next(1);
-            };
+            }
             if ($this->xtns->peek() == 2) {
                 $res['cRLIssuer'] = $this->xtns->next(2);
-
-            };
+            }
             $this->xtns->end();
             $crldps[] = $res;
         }
         $this->xtns->end();
+
         return $crldps;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $der
+     *
      * @return array
      */
     protected function authorityKeyIdentifier($der)
@@ -278,12 +298,15 @@ class X509 extends Der
             $res['authorityCertSerialNumber'] = $this->xtns->next();
         }
         $this->xtns->end();
+
         return $res;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $der
+     *
      * @return array
      */
     protected function subjectKeyIdentifier($der)
@@ -296,7 +319,9 @@ class X509 extends Der
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $der
+     *
      * @return array
      */
     protected function basicConstraints($der)
@@ -304,18 +329,23 @@ class X509 extends Der
         $res['cA'] = false;
         $this->xtns->init($der);
         $this->xtns->beginsequence();
-        if ($this->xtns->in()) $res['cA'] = $this->xtns->next(1);
-        # pathLenConstraint optional even if cA is true ???
+        if ($this->xtns->in()) {
+            $res['cA'] = $this->xtns->next(1);
+        }
+        // pathLenConstraint optional even if cA is true ???
         if ($res['cA'] && $this->xtns->in()) {
             $res['pathLenConstraint'] = $this->xtns->next(2);
         }
         $this->xtns->end();
+
         return $res;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $der
+     *
      * @return array
      */
     protected function extKeyUsage($der)
@@ -326,14 +356,18 @@ class X509 extends Der
             $res[$this->xtns->oid()] = 1;
         }
         $this->xtns->end();
+
         return $res;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $der
-     * @return array
+     *
      * @throws \Exception
+     *
+     * @return array
      */
     protected function subjectAltName($der)
     {
@@ -343,12 +377,15 @@ class X509 extends Der
             $res['subjectAltName'][] = $this->xtns->generalName();
         }
         $this->xtns->end();
+
         return $res;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $der
+     *
      * @return array
      */
     protected function privateKeyUsagePeriod($der)
@@ -362,25 +399,31 @@ class X509 extends Der
             $res['notAfter'] = $this->xtns->time(-24);
         }
         $this->xtns->end();
+
         return $res;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $der
+     *
      * @return bool|int|null|string
      */
     protected function ocspNoCheck($der)
     {
         $this->xtns->init($der);
+
         return $this->xtns->next();
     }
 
-    # RFC 2313 p. 15 ...
+    // RFC 2313 p. 15 ...
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $der
+     *
      * @return array
      */
     public function RSASignatureValue($der)
@@ -388,7 +431,7 @@ class X509 extends Der
         $this->xtns->init($der);
         $res['digestAlgorithm']['algorithm'] = $this->xtns->oid();
         $res['digestAlgorithm']['parameters'] = $this->next();
+
         return $res;
     }
-
 }
