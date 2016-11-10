@@ -1,17 +1,17 @@
 <?php
 
 use App\Http\Controllers\Controller;
+use Nodes\NemId\Login\CertificationCheck\CertificationCheck;
 use Nodes\NemId\Login\Errors\ErrorHandler;
 use Nodes\NemId\Login\Login as NemIdLogin;
-use Nodes\NemId\Login\CertificationCheck\CertificationCheck;
 
 class NemIdController extends Controller
 {
-
     /**
-     * Login view for nemid
+     * Login view for nemid.
      *
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return \Illuminate\View\View
      */
     public function view()
@@ -21,9 +21,8 @@ class NemIdController extends Controller
         return view('applet', compact('nemIdLogin'));
     }
 
-
     /**
-     * Callback after login
+     * Callback after login.
      *
      * @author Casper Rasmussen <cr@nodes.dk>
      */
@@ -32,7 +31,7 @@ class NemIdController extends Controller
         // Decode response
         $response = base64_decode(\Input::get('response'));
 
-        if(!CertificationCheck::isXml($response)) {
+        if (!CertificationCheck::isXml($response)) {
             $error = ErrorHandler::getByCode($response);
 
             // Redirect with error $error->toJson()
@@ -44,7 +43,6 @@ class NemIdController extends Controller
             $certificate = $userCertificate->checkAndReturnCertificate($response);
         } catch (\Exception $e) {
             // Error with validation of certificate chain or signature
-
         }
 
         // Successfully

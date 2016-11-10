@@ -6,7 +6,6 @@ use Nodes\NemId\Core\Nemid52Compat;
 
 class Login
 {
-
     /**
      * @var int
      */
@@ -15,14 +14,13 @@ class Login
     /**
      * @var string
      */
-    protected $iFrameUrl, $params;
+    protected $iFrameUrl;
+    protected $params;
 
     /**
-     * Login constructor
+     * Login constructor.
      *
      * @author Casper Rasmussen <cr@nodes.dk>
-     *
-     * @access public
      *
      * @param array $settings
      * @param null  $mode
@@ -30,25 +28,25 @@ class Login
     public function __construct(array $settings, $mode = null)
     {
         $this->settings = new Settings($settings, $mode);
-        $this->timeStamp = (int)round(microtime(true) * 1000);
+        $this->timeStamp = (int) round(microtime(true) * 1000);
 
         $this->generateIFrameUrl();
         $this->generateParams();
     }
 
     /**
-     * Generates the Iframe url by combining baseUrl, uiMode and timeStamp
+     * Generates the Iframe url by combining baseUrl, uiMode and timeStamp.
      *
      * @author Casper Rasmussen <cr@nodes.dk>
      */
     private function generateIFrameUrl()
     {
         $this->iFrameUrl =
-            $this->settings->getBaseUrl() . 'launcher/' . $this->settings->getUiMode() . '/' . $this->timeStamp;
+            $this->settings->getBaseUrl().'launcher/'.$this->settings->getUiMode().'/'.$this->timeStamp;
     }
 
     /**
-     * Generate the params for Iframe
+     * Generate the params for Iframe.
      *
      * @author Casper Rasmussen <cr@nodes.dk>
      */
@@ -60,9 +58,9 @@ class Login
 
         // Init start params
         $params = [
-            "SP_CERT" => $certificate,
-            "CLIENTFLOW" => "Oceslogin2",
-            "TIMESTAMP" => $this->timeStamp,
+            'SP_CERT'    => $certificate,
+            'CLIENTFLOW' => 'Oceslogin2',
+            'TIMESTAMP'  => $this->timeStamp,
         ];
 
         // Add origin if set
@@ -76,10 +74,10 @@ class Login
         }
 
         // Sort & normalize
-        uksort($params, "strnatcasecmp");
+        uksort($params, 'strnatcasecmp');
         $normalized = '';
         foreach ($params as $name => $value) {
-            $normalized .= $name . $value;
+            $normalized .= $name.$value;
         }
 
         // UTF8 encode it
@@ -104,9 +102,9 @@ class Login
         $this->params = $encodedParams;
     }
 
-
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getIFrameUrl()
@@ -116,6 +114,7 @@ class Login
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return mixed
      */
     public function getParams()
@@ -125,6 +124,7 @@ class Login
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getBaseUrl()
@@ -134,6 +134,7 @@ class Login
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return \Nodes\NemId\Login\Settings
      */
     public function getSettings()

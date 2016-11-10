@@ -1,8 +1,9 @@
 <?php
+
 namespace Nodes\NemId\Core;
 
 /**
- * Class Mode
+ * Class Mode.
  *
  * @author Casper Rasmussen <cr@nodes.dk>
  */
@@ -66,6 +67,7 @@ class Mode
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $isTest
      */
     public function setTestMode($isTest)
@@ -79,6 +81,7 @@ class Mode
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return bool
      */
     public function isFromSettings()
@@ -88,11 +91,11 @@ class Mode
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return bool
      */
     public function isTest()
     {
         return $this->mode == $this->test;
     }
-
 }
