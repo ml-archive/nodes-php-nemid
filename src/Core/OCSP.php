@@ -235,6 +235,7 @@ class OCSP extends X509
     protected function singleResponses()
     {
         $this->xtns->beginsequence();
+        $res = [];
         while ($this->xtns->in()) {
             $this->xtns->beginsequence();
             $srres['certID'] = $this->certID();

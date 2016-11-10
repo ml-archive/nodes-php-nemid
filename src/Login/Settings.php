@@ -39,20 +39,24 @@ class Settings
     protected $showCancelBtn;
 
     /**
-     * Settings constructor.
+     * Settings constructor
      *
-     * @param \Nodes\NemId\Core\Mode|null $mode
+     * @author Casper Rasmussen <cr@nodes.dk>
+     *
+     * @access public
+     *
+     * @param array $settings
+     * @param null  $mode
      * @throws \Exception
      */
-    public function __construct($mode = null)
+    public function __construct(array $settings, $mode = null)
     {
         // Fallback to default mode
         if(!$mode || !($mode instanceof Mode)) {
             $mode =  new Mode();
         }
 
-        // Retrieve settings
-        $this->settings = config('nodes.nemid');
+        $this->settings = $settings;
 
         if(!$this->settings) {
             throw new \Exception('Missing config');

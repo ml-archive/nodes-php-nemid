@@ -18,13 +18,18 @@ class Login
     protected $iFrameUrl, $params;
 
     /**
-     * Login constructor.
+     * Login constructor
      *
-     * @param \Nodes\NemId\Core\Mode|null $mode
+     * @author Casper Rasmussen <cr@nodes.dk>
+     *
+     * @access public
+     *
+     * @param array $settings
+     * @param null  $mode
      */
-    public function __construct($mode = null)
+    public function __construct(array $settings, $mode = null)
     {
-        $this->settings = new Settings($mode);
+        $this->settings = new Settings($settings);
         $this->timeStamp = (int)round(microtime(true) * 1000);
 
         $this->generateIFrameUrl();

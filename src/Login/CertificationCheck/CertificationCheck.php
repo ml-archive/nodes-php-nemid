@@ -24,6 +24,16 @@ class CertificationCheck
     const GENERALIZED_TIME_FORMAT = 'YmdHis\Z';
 
     /**
+     * @var array
+     */
+    protected $settings;
+
+    public function __construct(array $settings)
+    {
+        $this->settings = $settings;
+    }
+
+    /**
      * Validates xml string
      *
      * @author Casper Rasmussen <cr@nodes.dk>
@@ -86,7 +96,7 @@ class CertificationCheck
         $this->simpleVerifyCertificateChain($certificateChain);
 
         // Check ocsp
-        if(config('nodes.nemid.login.checkOcsp')) {
+        if($this->settings['login']['checkOcsp']) {
             $this->checkOcsp($certificateChain);
         }
 
@@ -188,7 +198,7 @@ class CertificationCheck
         # first digest is for the root ...
         # check the root digest against a list of known root oces certificates
         $digest = hash('sha256', $certificateChain[0]->getCertificateDer());
-        if (!in_array($digest, array_values(config('nodes.nemid.login.certificationDigests')))) {
+        if (!in_array($digest, array_values($this->settings['login']['certificationDigests']))) {
             throw new InvalidCertificateException('Certificate chain not signed by any trustedroots');
         }
     }
@@ -266,15 +276,15 @@ class CertificationCheck
             ];
 
             // Set proxy
-            if (config('nemid.login.proxy')) {
-                $params['proxy'] = config('nodes.nemid.login.proxy');
+            if ($proxy = $this->settings['nemid']['login']['proxy']) {
+                $params['proxy'] = $proxy;
             }
 
             // Execute request
             $response = $client->request('POST', $url, $params);
             $ocspResponse = $ocspClient->response($response->getBody()->getContents());
 
-            // TODO, in php seven responseStatus is malformed
+            // TODO, in php 7 responseStatus is malformed
             // $ocspResponse['responseStatus'] == 'malformedRequest'
         } catch (\Exception $e) {
             throw new InvalidCertificateException('Failed to check certificate: ' . $e->getMessage());
