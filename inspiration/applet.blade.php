@@ -34,7 +34,7 @@
 </script>
 
 @if(! isset($_SESSION['nemid_login']['errors']))
-    <iframe id="nemid_iframe" title="NemID" allowfullscreen="true" scrolling="no" frameborder="0" style="width:500px;height:450px;border:0" src="{{$nemIdLogin->getIFrameUrl()}}"></iframe>
+    <iframe id="nemid_iframe" title="NemID" allowfullscreen="true" scrolling="no" frameborder="0" style="width:320px;height:460px;border:0" src="{{$nemIdLogin->getIFrameUrl()}}"></iframe>
     {!! Form::open(['method' => 'post', 'route' => 'nemid.callback', 'name' => 'postBackForm']) !!}
     <input type="hidden" name="response" value=""/>
 @else
