@@ -36,7 +36,7 @@ return [
         // Check for certificate matching after login
         'certificationDigests' => [
         ],
-        'checkOcsp' => true, // The certificate can be validated through a external request
+        'checkOcsp' => false, // The certificate can be validated through a external request
         'proxy' => false // Since you only have 10 ip whitelisted, it can be smart to proxy the ip calls
 
     ],
