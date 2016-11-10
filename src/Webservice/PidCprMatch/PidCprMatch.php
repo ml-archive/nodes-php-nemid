@@ -20,19 +20,25 @@ class PidCprMatch
     protected $settings;
 
     /**
-     * PidCprMatch constructor.
+     * PidCprMatch constructor
      *
-     * @param \Nodes\NemId\Core\Mode|null $mode
+     * @author Casper Rasmussen <cr@nodes.dk>
+     * @access public
+     *
+     * @param array $settings
+     * @param null  $mode
      */
-    public function __construct($mode = null)
+    public function __construct(array $settings, $mode = null)
     {
-        $this->settings = new Settings($mode);
+        $this->settings = new Settings($settings, $mode);
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $pid
      * @param $cpr
+     *
      * @return \Nodes\NemId\PidCprMatch\Responses\Response
      * @throws \Exception
      */
@@ -48,8 +54,8 @@ class PidCprMatch
 
         $pidCprRequestParams = [
             'serviceId' => $this->settings->getServiceId(),
-            'pid' => $pid,
-            'cpr' => $cpr,
+            'pid'       => $pid,
+            'cpr'       => $cpr,
         ];
 
 
@@ -58,7 +64,7 @@ class PidCprMatch
         $element->setAttribute("id", uniqid());
 
         foreach ((array)$pidCprRequestParams as $p => $v) {
-            $element = $xp->query('/method/request/' . $p)
+            $element    = $xp->query('/method/request/'.$p)
                 ->item(0);
             $newelement = $document->createTextNode($v);
             $element->replaceChild($newelement, $element->firstChild);
@@ -67,7 +73,7 @@ class PidCprMatch
         $pidCprRequest = $document->saveXML();
 
         // Check that certificate exists
-        if (!file_exists($this->settings->getCertificateAndKey())) {
+        if ( ! file_exists($this->settings->getCertificateAndKey())) {
             throw new \Exception('Certificate was not found');
         }
 
@@ -77,18 +83,18 @@ class PidCprMatch
         try {
             // Build params
             $params = [
-                'cert' => [
+                'cert'            => [
                     $this->settings->getCertificateAndKey(),
-                    $this->settings->getPassword()
+                    $this->settings->getPassword(),
                 ],
-                'form_params' => [
-                    'PID_REQUEST' => $pidCprRequest
+                'form_params'     => [
+                    'PID_REQUEST' => $pidCprRequest,
                 ],
                 'connect_timeout' => 10,
             ];
 
             // Set proxy
-            if($this->settings->hasProxy()) {
+            if ($this->settings->hasProxy()) {
                 $params['proxy'] = $this->settings->getProxy();
             }
 
@@ -97,12 +103,13 @@ class PidCprMatch
 
             // Parse status code
             $document->loadXML($response->getBody()->getContents());
-            $xp = new \DomXPath($document);
+            $xp     = new \DomXPath($document);
             $status = intval($xp->query('/method/response/status/@statusCode')->item(0)->value);
 
             return new Response($status);
         } catch (\Exception $e) {
             bugsnag_report($e);
+
             return new Response(-1, $e);
         }
 

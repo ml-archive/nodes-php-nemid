@@ -58,10 +58,6 @@ class Settings
 
         $this->settings = $settings;
 
-        if(!$this->settings) {
-            throw new \Exception('Missing config');
-        }
-
         // Decide on mode and key in settings
         if($mode->isFromSettings()) {
             $this->isTest = (bool) $this->settings['test'];
