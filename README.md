@@ -16,7 +16,7 @@ This is a rewrite of an original library for an older version of the applet in j
 
 Original library can be found: https://code.google.com/p/nemid-php/ 
     
-## 🔧 Setup
+## 🔧 Laravel Setup
 
 Setup service provider in `config/app.php`
 
