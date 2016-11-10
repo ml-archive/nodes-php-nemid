@@ -3,14 +3,12 @@
 namespace Nodes\NemId\PidCprMatch;
 
 /**
- * Class Settings
+ * Class Settings.
  *
  * @author  Casper Rasmussen <cr@nodes.dk>
- * @package Nodes\NemId\PidCprMatch
  */
 class Settings
 {
-
     /**
      * @var bool
      */
@@ -42,11 +40,9 @@ class Settings
     protected $proxy;
 
     /**
-     * Settings constructor
+     * Settings constructor.
      *
      * @author Casper Rasmussen <cr@nodes.dk>
-     *
-     * @access public
      *
      * @param array $settings
      * @param null  $mode
@@ -58,7 +54,7 @@ class Settings
 
         // Decide on mode and key in settings
         if ($mode->isFromSettings()) {
-            $this->isTest = (bool)$this->settings['test'];
+            $this->isTest = (bool) $this->settings['test'];
         } else {
             $this->isTest = $mode->isTest();
         }
@@ -78,6 +74,7 @@ class Settings
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getServiceId()
@@ -87,6 +84,7 @@ class Settings
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getPassword()
@@ -96,6 +94,7 @@ class Settings
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getCertificateAndKey()
@@ -105,6 +104,7 @@ class Settings
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getServer()
@@ -114,6 +114,7 @@ class Settings
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return bool
      */
     public function hasProxy()
@@ -123,9 +124,11 @@ class Settings
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return false|string
      */
-    public function getProxy() {
+    public function getProxy()
+    {
         return $this->proxy;
     }
 }

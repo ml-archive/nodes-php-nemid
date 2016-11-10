@@ -3,10 +3,9 @@
 namespace Nodes\NemId\Login\CertificationCheck\Exceptions;
 
 /**
- * Class InvalidSignatureException
- * @author  Casper Rasmussen <cr@nodes.dk>
+ * Class InvalidSignatureException.
  *
- * @package Nodes\NemId\Login\CertificationCheck\Exception
+ * @author  Casper Rasmussen <cr@nodes.dk>
  */
 class InvalidSignatureException extends \Exception
 {

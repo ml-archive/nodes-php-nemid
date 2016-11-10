@@ -1,18 +1,16 @@
 <?php
 
 namespace Nodes\NemId\Login;
+
 use Nodes\NemId\Core\Mode;
 
 /**
- * Class Settings
+ * Class Settings.
  *
  * @author Casper Rasmussen <cr@nodes.dk>
- *
- * @package Nodes\NemId
  */
 class Settings
 {
-
     /**
      * @var array
      */
@@ -21,15 +19,19 @@ class Settings
     /**
      * @var string
      */
-    protected $baseUrl, $uiMode, $privateKey, $privateKeyPassword, $certificate;
+    protected $baseUrl;
+    protected $uiMode;
+    protected $privateKey;
+    protected $privateKeyPassword;
+    protected $certificate;
 
     /**
-     * var boolean
+     * var boolean.
      */
     protected $isTest;
 
     /**
-     * @var boolean | string
+     * @var bool | string
      */
     protected $origin;
 
@@ -39,27 +41,26 @@ class Settings
     protected $showCancelBtn;
 
     /**
-     * Settings constructor
+     * Settings constructor.
      *
      * @author Casper Rasmussen <cr@nodes.dk>
      *
-     * @access public
-     *
      * @param array $settings
      * @param null  $mode
+     *
      * @throws \Exception
      */
     public function __construct(array $settings, $mode = null)
     {
         // Fallback to default mode
-        if(!$mode || !($mode instanceof Mode)) {
-            $mode =  new Mode();
+        if (!$mode || !($mode instanceof Mode)) {
+            $mode = new Mode();
         }
 
         $this->settings = $settings;
 
         // Decide on mode and key in settings
-        if($mode->isFromSettings()) {
+        if ($mode->isFromSettings()) {
             $this->isTest = (bool) $this->settings['test'];
         } else {
             $this->isTest = $mode->isTest();
@@ -83,6 +84,7 @@ class Settings
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getCertificate()
@@ -92,6 +94,7 @@ class Settings
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getPrivateKey()
@@ -101,6 +104,7 @@ class Settings
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getPrivateKeyPassword()
@@ -110,6 +114,7 @@ class Settings
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getUiMode()
@@ -119,6 +124,7 @@ class Settings
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getBaseUrl()
@@ -128,6 +134,7 @@ class Settings
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return bool
      */
     public function isTest()
@@ -137,15 +144,17 @@ class Settings
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return bool
      */
     public function hasOrigin()
     {
-        return ! empty($this->origin);
+        return !empty($this->origin);
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return bool|string
      */
     public function getOrigin()
@@ -155,6 +164,7 @@ class Settings
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return bool
      */
     public function showCancelBtn()

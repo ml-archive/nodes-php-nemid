@@ -11,15 +11,14 @@ use Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidSignatureException;
 use Nodes\NemId\Login\CertificationCheck\Models\Certificate;
 
 /**
- * Class UserCertificateCheck
+ * Class UserCertificateCheck.
  *
  * @author  Casper Rasmussen <cr@nodes.dk>
- * @package Nodes\NemId\Login\CertificationCheck
  */
 class CertificationCheck
 {
     /**
-     * Constant for time format
+     * Constant for time format.
      */
     const GENERALIZED_TIME_FORMAT = 'YmdHis\Z';
 
@@ -34,10 +33,12 @@ class CertificationCheck
     }
 
     /**
-     * Validates xml string
+     * Validates xml string.
      *
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $xml
+     *
      * @return bool
      */
     public static function isXml($xml)
@@ -64,10 +65,13 @@ class CertificationCheck
      * 7. Translate the PID or RID to a CPR number.
      *
      * @author Casper Rasmussen <cr@nodes.dk>
-     * @param            $xml
-     * @return \Nodes\NemId\Login\CertificationCheck\Models\Certificate
+     *
+     * @param   $xml
+     *
      * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidCertificateException
      * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidSignatureException
+     *
+     * @return \Nodes\NemId\Login\CertificationCheck\Models\Certificate
      */
     public function checkAndReturnCertificate($xml)
     {
@@ -96,7 +100,7 @@ class CertificationCheck
         $this->simpleVerifyCertificateChain($certificateChain);
 
         // Check ocsp
-        if($this->settings['login']['checkOcsp']) {
+        if ($this->settings['login']['checkOcsp']) {
             $this->checkOcsp($certificateChain);
         }
 
@@ -105,22 +109,26 @@ class CertificationCheck
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param \Nodes\NemId\Login\CertificationCheck\Models\Certificate $certificate
+     *
      * @return string
      */
     private function certificateAsPem(Certificate $certificate)
     {
         return "-----BEGIN CERTIFICATE-----\n"
-               . chunk_split(base64_encode($certificate->getCertificateDer()))
-               . "-----END CERTIFICATE-----";
+               .chunk_split(base64_encode($certificate->getCertificateDer()))
+               .'-----END CERTIFICATE-----';
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $data
      * @param $signature
      * @param $signatureAlgorithm
      * @param $publicKeyPem
+     *
      * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidSignatureException
      */
     protected function verifyRSASignature($data, $signature, $signatureAlgorithm, $publicKeyPem)
@@ -135,10 +143,12 @@ class CertificationCheck
     }
 
     /**
-     * Verify certificate chain
+     * Verify certificate chain.
      *
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param array $certificateChain
+     *
      * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidCertificateException
      * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidSignatureException
      */
@@ -146,19 +156,19 @@ class CertificationCheck
     {
         // Init variable
         $keyUsages = ['digitalSignature'];
-        $maxPathLength = 1; # as per RFC 5280: 'maximum number of non-self-issued intermediate certificates'
+        $maxPathLength = 1; // as per RFC 5280: 'maximum number of non-self-issued intermediate certificates'
         $now = gmdate(self::GENERALIZED_TIME_FORMAT);
 
         // Check length
-        if (sizeof($certificateChain) != ($maxPathLength + 2)) {
-            throw new InvalidCertificateException('Length of certificate chain is not ' . $maxPathLength);
+        if (count($certificateChain) != ($maxPathLength + 2)) {
+            throw new InvalidCertificateException('Length of certificate chain is not '.$maxPathLength);
         }
 
         // Check key usage
         $leaf = $maxPathLength + 1;
         foreach ($keyUsages as $usage) {
             if (!($certificateChain[$leaf]->getTbsCertificate()['extensions']['keyUsage']['extnValue'][$usage])) {
-                throw new InvalidCertificateException('Certificate has not keyUsage: ' . $usage);
+                throw new InvalidCertificateException('Certificate has not keyUsage: '.$usage);
             }
         }
 
@@ -166,7 +176,7 @@ class CertificationCheck
         for ($i = $leaf; $i > 0; $i--) {
             $issuer = max($i - 1, 0);
             $der = $certificateChain[$i]->getTbsCertificate()['tbsCertificate_der'];
-            # skip first null byte - number of unused bits at the end ...
+            // skip first null byte - number of unused bits at the end ...
             $signature = substr($certificateChain[$i]->getSignature(), 1);
             $this->verifyRSASignature($der, $signature, $certificateChain[$i]->getSignatureAlgorithm(), $this->certificateAsPem($certificateChain[$issuer]));
 
@@ -195,8 +205,8 @@ class CertificationCheck
             }
         }
 
-        # first digest is for the root ...
-        # check the root digest against a list of known root oces certificates
+        // first digest is for the root ...
+        // check the root digest against a list of known root oces certificates
         $digest = hash('sha256', $certificateChain[0]->getCertificateDer());
         if (!in_array($digest, array_values($this->settings['login']['certificationDigests']))) {
             throw new InvalidCertificateException('Certificate chain not signed by any trustedroots');
@@ -204,11 +214,13 @@ class CertificationCheck
     }
 
     /**
-     * Verifies the signed element in the returned signature
+     * Verifies the signed element in the returned signature.
      *
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param \DomXPath                                                $xp
      * @param \Nodes\NemId\Login\CertificationCheck\Models\Certificate $certificate
+     *
      * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidSignatureException
      */
     protected function verifySignature(\DomXPath $xp, Certificate $certificate)
@@ -236,10 +248,12 @@ class CertificationCheck
 
     /**
      * Does the ocsp check of the last certificate in the $certificateChain
-     * $certificateChain contains root + intermediate + user certs
+     * $certificateChain contains root + intermediate + user certs.
      *
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param array $certificateChain
+     *
      * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidCertificateException
      * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidSignatureException
      */
@@ -269,7 +283,7 @@ class CertificationCheck
             // Build params
             $params = [
                 'headers'         => [
-                    'Content-type: application/ocsp-request' . "\r\n",
+                    'Content-type: application/ocsp-request'."\r\n",
                 ],
                 'body'            => $ocsPreq,
                 'connect_timeout' => 10,
@@ -287,7 +301,7 @@ class CertificationCheck
             // TODO, in php 7 responseStatus is malformed
             // $ocspResponse['responseStatus'] == 'malformedRequest'
         } catch (\Exception $e) {
-            throw new InvalidCertificateException('Failed to check certificate: ' . $e->getMessage());
+            throw new InvalidCertificateException('Failed to check certificate: '.$e->getMessage());
         }
         // Check that the response was signed with the accompanying certificate
         $der = $ocspResponse['responseBytes']['BasicOCSPResponse']['tbsResponseData_der'];
@@ -362,13 +376,16 @@ class CertificationCheck
     /**
      * Extracts, parses and orders - leaf to root - the certificates returned by NemID.
      * $xp is the DomXPath object - the XML text isn't needed
-     * $x509 is the parser object
+     * $x509 is the parser object.
      *
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param \DOMXPath              $xp
      * @param \Nodes\NemId\Core\X509 $x509
-     * @return array
+     *
      * @throws InvalidCertificateException
+     *
+     * @return array
      */
     protected function xml2certs(\DOMXPath $xp, X509 $x509)
     {
@@ -385,7 +402,7 @@ class CertificationCheck
             $count[$cert['tbsCertificate']['subject_']] = 0;
             $count[$cert['tbsCertificate']['issuer_']] = 0;
         }
-        # maybe hash of structure instead ...
+        // maybe hash of structure instead ...
         foreach ($certsbysubject as $cert) {
             $count[$cert['tbsCertificate']['subject_']]++;
             $count[$cert['tbsCertificate']['issuer_']]++;
@@ -393,7 +410,7 @@ class CertificationCheck
 
         $checks = array_count_values($count);
 
-        # the subject of the leaf certificate appears only once ...
+        // the subject of the leaf certificate appears only once ...
         if ($checks[1] != 1) {
             throw new InvalidCertificateException('Couldn\'t find leaf certificate');
         }
@@ -401,10 +418,10 @@ class CertificationCheck
         $certpath = [];
         $leafcert = array_search(1, $count);
 
-        # $certpath is sorted list root first ..
+        // $certpath is sorted list root first ..
         while ($leafcert) {
             array_unshift($certpath, $certsbysubject[$leafcert]);
-            #$certpath[] = $certsbysubject[$leafcert];
+            //$certpath[] = $certsbysubject[$leafcert];
             $next = $certsbysubject[$leafcert]['tbsCertificate']['issuer_'];
             if ($next == $leafcert) {
                 break;

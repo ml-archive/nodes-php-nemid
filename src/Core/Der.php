@@ -1,23 +1,28 @@
 <?php
+
 namespace Nodes\NemId\Core;
 
 /**
- * Class Der
+ * Class Der.
  *
  * @author  Taken from the WAYF repo
- * @package Nodes\NemId\Core
  */
 class Der extends Oids
 {
     /**
      * @var
      */
-    protected $tag, $len, $value, $class, $constructed;
+    protected $tag;
+    protected $len;
+    protected $value;
+    protected $class;
+    protected $constructed;
 
     /**
      * @var array
      */
-    protected $buffer, $stack = [];
+    protected $buffer;
+    protected $stack = [];
 
     /**
      * @var
@@ -39,7 +44,7 @@ class Der extends Oids
     protected function init($der)
     {
         $this->buffer = $der;
-        $this->i      = 0;
+        $this->i = 0;
     }
 
     /**
@@ -53,7 +58,7 @@ class Der extends Oids
         print_r("$note\n");
         print_r("len: $z\n");
         print_r(chunk_split(bin2hex(substr($this->buffer, $this->i)), 2, ':'));
-        print "\n";
+        echo "\n";
     }
 
     /**
@@ -63,13 +68,13 @@ class Der extends Oids
      */
     protected function pr($note = '')
     {
-        $savei       = $this->i;
-        $byte        = ord($this->buffer[$this->i++]);
-        $tag         = $byte & 0x1f;
-        $class       = $byte & 0xc0;
+        $savei = $this->i;
+        $byte = ord($this->buffer[$this->i++]);
+        $tag = $byte & 0x1f;
+        $class = $byte & 0xc0;
         $constructed = $byte & 0x20;
-        $len         = $this->vallen();
-        $this->i     = $savei;
+        $len = $this->vallen();
+        $this->i = $savei;
         print_r("$note\n");
         print_r("i  : {$this->i}\n");
         print_r("len: {$len}\n");
@@ -87,7 +92,7 @@ class Der extends Oids
      */
     private function tlv($expectedtag = null)
     {
-        $byte      = ord($this->buffer[$this->i++]);
+        $byte = ord($this->buffer[$this->i++]);
         $this->tag = $byte & 0x1f;
         if ($expectedtag < 0) {
             $this->tag = $expectedtag = -$expectedtag;
@@ -97,9 +102,9 @@ class Der extends Oids
             print_r(bin2hex(substr($this->buffer, $x, 32)));
             trigger_error("expected tag == $expectedtag, got {$this->tag}\n", E_USER_ERROR);
         }
-        $this->class       = $byte & 0xc0;
+        $this->class = $byte & 0xc0;
         $this->constructed = $byte & 0x20;
-        $this->len         = $this->vallen();
+        $this->len = $this->vallen();
     }
 
     /**
@@ -117,18 +122,18 @@ class Der extends Oids
         } else {
             $value = substr($this->buffer, $this->i, $this->len);
             if ($this->class == 0 || $this->class == 0x80) {
-                if ($this->tag == 2 || $this->tag == 10) { # ints and enums
+                if ($this->tag == 2 || $this->tag == 10) { // ints and enums
                     $int = 0;
                     foreach (str_split($value) as $byte) {
                         $int = bcmul($int, '256', 0);
                         $int = bcadd($int, ord($byte), 0);
                     }
                     $this->value = $int;
-                } elseif ($this->tag == 1) { # boolean
+                } elseif ($this->tag == 1) { // boolean
                     $this->value = ord($value) != 0;
-                } elseif ($this->tag == 3) { # bit string
+                } elseif ($this->tag == 3) { // bit string
                     $this->value = $value;
-                } elseif ($this->tag == 5) { # null
+                } elseif ($this->tag == 5) { // null
                     $this->value = null;
                 } else {
                     $this->value = $value;
@@ -153,7 +158,7 @@ class Der extends Oids
         $oldi = $this->i;
         $this->tlv($expectedtag);
         $i = $this->i;
-        if ( ! $pass) {
+        if (!$pass) {
             $this->i = $oldi;
         } else {
             $this->i += $this->len;
@@ -164,7 +169,7 @@ class Der extends Oids
 
     /**
      * If provided with a tag and the tag is equal to the current tag
-     * peek considers it EXPLICIT, consumes it and return true
+     * peek considers it EXPLICIT, consumes it and return true.
      *
      * @author Casper Rasmussen <cr@nodes.dk>
      *
@@ -193,12 +198,13 @@ class Der extends Oids
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return int
      */
     protected function vallen()
     {
         $byte = ord($this->buffer[$this->i++]);
-        $res  = $len = $byte & 0x7f;
+        $res = $len = $byte & 0x7f;
         if ($byte >= 0x80) {
             $res = 0;
             for ($c = 0; $c < $len; $c++) {
@@ -242,6 +248,7 @@ class Der extends Oids
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return bool
      */
     protected function in()
@@ -262,6 +269,7 @@ class Der extends Oids
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return array
      */
     protected function extensions()
@@ -270,13 +278,13 @@ class Der extends Oids
         $extns = [];
         while ($this->in()) {
             $this->beginsequence();
-            $extnID              = $this->oid();
-            $theext['critical']  = $this->peek(1);
+            $extnID = $this->oid();
+            $theext['critical'] = $this->peek(1);
             $theext['extnValue'] = $this->next(4);
             try {
                 if (method_exists($this, $extnID)) {
                     $theext['extnValue'] = call_user_func([$this, $extnID], $theext['extnValue']);
-                } elseif ( ! empty($this->ignoredextensions['$extnID'])) {
+                } elseif (!empty($this->ignoredextensions['$extnID'])) {
                     trigger_error("Unknown extension $extnID", E_USER_ERROR);
                 } else {
                     $theext['extnValue'] = chunk_split(bin2hex($theext['extnValue']), 2, ':');
@@ -294,6 +302,7 @@ class Der extends Oids
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     protected function signatureAlgorithm()
@@ -301,7 +310,7 @@ class Der extends Oids
         $this->beginsequence();
         $salg = $this->oid();
         if ($this->in()) {
-            $this->next(); # alg param - ignore for now
+            $this->next(); // alg param - ignore for now
         }
         $this->end();
 
@@ -317,14 +326,14 @@ class Der extends Oids
      */
     protected function name($tag = null)
     {
-        $this->beginsequence($tag);  # seq of RDN
+        $this->beginsequence($tag);  // seq of RDN
         $res = [];
         while ($this->in()) {
             $parts = [];
-            $this->beginset(); # set of AttributeTypeAndValue
+            $this->beginset(); // set of AttributeTypeAndValue
             while ($this->in()) {
                 $this->beginsequence();
-                $parts[$this->oid()] = $this->next(); # AttributeValue
+                $parts[$this->oid()] = $this->next(); // AttributeValue
                 $this->end();
             }
             $this->end();
@@ -362,13 +371,13 @@ class Der extends Oids
     protected function oid_($oid)
     {
         $len = strlen($oid);
-        $v   = "";
-        $n   = 0;
+        $v = '';
+        $n = 0;
         for ($c = 0; $c < $len; $c++) {
             $x = ord($oid[$c]);
             $n = $n * 128 + ($x & 0x7f);
             if ($x <= 127) {
-                $v .= $v ? '.'.$n : ((int)($n / 40).'.'.($n % 40));
+                $v .= $v ? '.'.$n : ((int) ($n / 40).'.'.($n % 40));
                 $n = 0;
             }
         }

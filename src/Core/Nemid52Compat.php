@@ -3,20 +3,20 @@
 namespace Nodes\NemId\Core;
 
 /**
- * Class Nemid52Compat
+ * Class Nemid52Compat.
  *
  * @author  cr@nodes.dk
  *          Original taken from https://code.google.com/p/nemid-php/
- * @package Nodes\NemId\Core
  */
 class Nemid52Compat
 {
-
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $data
      * @param $privateKeyId
      * @param $signatureAlgorithm
+     *
      * @return mixed
      */
     public static function openSslSign($data, $privateKeyId, $signatureAlgorithm)
@@ -29,10 +29,12 @@ class Nemid52Compat
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $data
      * @param $signature
      * @param $publicKeyId
      * @param $signatureAlgorithm
+     *
      * @return int 1|0
      */
     public static function openSslVerify($data, $signature, $publicKeyId, $signatureAlgorithm)
@@ -45,17 +47,20 @@ class Nemid52Compat
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $data
      * @param $keyId
      * @param $signatureAlgorithmLong
-     * @return string
+     *
      * @throws \Exception
+     *
+     * @return string
      */
     public static function myRsaShaEncode($data, $keyId, $signatureAlgorithmLong)
     {
         // Init possible algorithms
         $algorithms = [
-            'sha1WithRSAEncryption' => ['alg' => 'sha1', 'oid' => '1.3.14.3.2.26'],
+            'sha1WithRSAEncryption'   => ['alg' => 'sha1', 'oid' => '1.3.14.3.2.26'],
             'sha256WithRSAEncryption' => ['alg' => 'sha256', 'oid' => '2.16.840.1.101.3.4.2.1'],
             'sha384WithRSAEncryption' => ['alg' => 'sha384', 'oid' => '2.16.840.1.101.3.4.2.2'],
             'sha512WithRSAEncryption' => ['alg' => 'sha512', 'oid' => '2.16.840.1.101.3.4.2.3'],
@@ -65,7 +70,7 @@ class Nemid52Compat
         $pInfo = openssl_pkey_get_details($keyId);
 
         if (empty($algorithms[$signatureAlgorithmLong])) {
-            throw new \Exception('Unsupported signature algorithm: ' . $signatureAlgorithmLong);
+            throw new \Exception('Unsupported signature algorithm: '.$signatureAlgorithmLong);
         }
 
         // find the alg in options
@@ -78,27 +83,31 @@ class Nemid52Compat
         $digest = hash($signatureAlgorithm, $data, true);
 
 
-        $temp = self::sequence(self::sequence(self::s2oid($oid) . "\x05\x00") . self::octetstring($digest));
+        $temp = self::sequence(self::sequence(self::s2oid($oid)."\x05\x00").self::octetstring($digest));
         $psLen = $pInfo['bits'] / 8 - (strlen($temp) + 3);
 
-        $eb = "\x00\x01" . str_repeat("\xff", $psLen) . "\x00" . $temp;
+        $eb = "\x00\x01".str_repeat("\xff", $psLen)."\x00".$temp;
 
         return $eb;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $pdu
+     *
      * @return string
      */
     public static function sequence($pdu)
     {
-        return "\x30" . self::len($pdu) . $pdu;
+        return "\x30".self::len($pdu).$pdu;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $s
+     *
      * @return string
      */
     public static function s2oid($s)
@@ -117,17 +126,15 @@ class Nemid52Compat
             $der .= strrev($derrev);
         }
 
-        return "\x06" . self::len($der) . $der;
+        return "\x06".self::len($der).$der;
     }
 
-
-    static function octetstring($s)
+    public static function octetstring($s)
     {
-        return "\x04" . self::len($s) . $s;
+        return "\x04".self::len($s).$s;
     }
 
-
-    static function len($i)
+    public static function len($i)
     {
         $i = strlen($i);
         if ($i <= 127) {
