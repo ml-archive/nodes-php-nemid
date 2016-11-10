@@ -1,11 +1,11 @@
 <?php
+
 namespace Nodes\NemId\PidCprMatch\Responses;
 
 /**
- * Class Response
- * @author Casper Rasmussen <cr@nodes.dk>
+ * Class Response.
  *
- * @package Nodes\NemId\PidCprMatch
+ * @author Casper Rasmussen <cr@nodes.dk>
  */
 class Response
 {
@@ -39,30 +39,33 @@ class Response
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return array
      */
-    public function toArray() {
+    public function toArray()
+    {
         return [
-            'code' => $this->code,
-            'short' => $this->short,
-            'danish' => $this->danish,
-            'english' => $this->english
+            'code'    => $this->code,
+            'short'   => $this->short,
+            'danish'  => $this->danish,
+            'english' => $this->english,
         ];
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $code
      */
     private function setBy($code, $exception)
     {
-        $codes = require_once dirname(__FILE__) . '/response_codes.php';
+        $codes = require_once dirname(__FILE__).'/response_codes.php';
         $this->code = $code;
-        if ( ! empty($exception) && $exception instanceof \Exception) {
+        if (!empty($exception) && $exception instanceof \Exception) {
             $this->short = 'Exception';
             $this->danish = $exception->getMessage();
             $this->english = $exception->getMessage();
-        } else if ( ! empty($codes[$code])) {
+        } elseif (!empty($codes[$code])) {
             $this->short = $codes[$code]['short'];
             $this->danish = $codes[$code]['danish'];
             $this->english = $codes[$code]['english'];
@@ -75,6 +78,7 @@ class Response
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return bool
      */
     public function didMatch()
@@ -84,6 +88,7 @@ class Response
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return int
      */
     public function getCode()
@@ -93,6 +98,7 @@ class Response
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getShort()
@@ -102,6 +108,7 @@ class Response
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getDanish()
@@ -111,6 +118,7 @@ class Response
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getEnglish()

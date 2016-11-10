@@ -3,17 +3,18 @@
 namespace Nodes\NemId\Login\CertificationCheck\Models;
 
 /**
- * Class Certificate
- * @author  Casper Rasmussen <cr@nodes.dk>
+ * Class Certificate.
  *
- * @package Nodes\NemId\Login\CertificationCheck\Models
+ * @author  Casper Rasmussen <cr@nodes.dk>
  */
 class Certificate
 {
     /**
      * @var string
      */
-    protected $certificateDer, $signature, $signatureAlgorithm;
+    protected $certificateDer;
+    protected $signature;
+    protected $signatureAlgorithm;
 
     /**
      * @var array
@@ -35,6 +36,7 @@ class Certificate
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getCertificateDer()
@@ -44,6 +46,7 @@ class Certificate
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return array
      */
     public function getTbsCertificate()
@@ -53,6 +56,7 @@ class Certificate
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getSignatureAlgorithm()
@@ -62,6 +66,7 @@ class Certificate
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     public function getSignature()
@@ -71,20 +76,22 @@ class Certificate
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return array
      */
     public function toArray()
     {
         return [
-            'certificate_der' => $this->getCertificateDer(),
-            'tbsCertificate' => $this->getTbsCertificate(),
+            'certificate_der'    => $this->getCertificateDer(),
+            'tbsCertificate'     => $this->getTbsCertificate(),
             'signatureAlgorithm' => $this->getSignatureAlgorithm(),
-            'signature' => $this->getSignature()
+            'signature'          => $this->getSignature(),
         ];
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return \Nodes\NemId\Login\CertificationCheck\Models\Subject
      */
     public function getSubject()

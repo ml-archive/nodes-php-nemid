@@ -6,24 +6,21 @@ use GuzzleHttp\Client;
 use Nodes\NemId\PidCprMatch\Responses\Response;
 
 /**
- * Class PidCprMatch
+ * Class PidCprMatch.
  *
  * @author  Casper Rasmussen <cr@nodes.dk>
- * @package Nodes\NemId\PidCprMatch
  */
 class PidCprMatch
 {
-
     /**
      * @var \Nodes\NemId\PidCprMatch\Settings
      */
     protected $settings;
 
     /**
-     * PidCprMatch constructor
+     * PidCprMatch constructor.
      *
      * @author Casper Rasmussen <cr@nodes.dk>
-     * @access public
      *
      * @param array $settings
      * @param null  $mode
@@ -39,8 +36,9 @@ class PidCprMatch
      * @param $pid
      * @param $cpr
      *
-     * @return \Nodes\NemId\PidCprMatch\Responses\Response
      * @throws \Exception
+     *
+     * @return \Nodes\NemId\PidCprMatch\Responses\Response
      */
     public function pidCprRequest($pid, $cpr)
     {
@@ -61,10 +59,10 @@ class PidCprMatch
 
         $element = $xp->query('/method/request')
             ->item(0);
-        $element->setAttribute("id", uniqid());
+        $element->setAttribute('id', uniqid());
 
-        foreach ((array)$pidCprRequestParams as $p => $v) {
-            $element    = $xp->query('/method/request/'.$p)
+        foreach ((array) $pidCprRequestParams as $p => $v) {
+            $element = $xp->query('/method/request/'.$p)
                 ->item(0);
             $newelement = $document->createTextNode($v);
             $element->replaceChild($newelement, $element->firstChild);
@@ -73,7 +71,7 @@ class PidCprMatch
         $pidCprRequest = $document->saveXML();
 
         // Check that certificate exists
-        if ( ! file_exists($this->settings->getCertificateAndKey())) {
+        if (!file_exists($this->settings->getCertificateAndKey())) {
             throw new \Exception('Certificate was not found');
         }
 
@@ -103,7 +101,7 @@ class PidCprMatch
 
             // Parse status code
             $document->loadXML($response->getBody()->getContents());
-            $xp     = new \DomXPath($document);
+            $xp = new \DomXPath($document);
             $status = intval($xp->query('/method/response/status/@statusCode')->item(0)->value);
 
             return new Response($status);
@@ -112,6 +110,5 @@ class PidCprMatch
 
             return new Response(-1, $e);
         }
-
     }
 }
