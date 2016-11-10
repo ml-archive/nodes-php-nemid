@@ -1,6 +1,8 @@
 # Nem-id integration
 
 A PHP Laravel library for using the Danish NemID for authenticating a user.
+
+I'm sure it can be used easily without laravel also. Feel free to contribute to improvements
  
 ### The library supports: 
   - Preparing the parameters for the applet
