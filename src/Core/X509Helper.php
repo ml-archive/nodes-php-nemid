@@ -3,20 +3,20 @@
 namespace Nodes\NemId\Core;
 
 /**
- * More or less 1:1 copy from WAYF Library
+ * More or less 1:1 copy from WAYF Library.
  *
  * Class X509Helper
- * @author  Taken from the WAYF repo
  *
- * @package Nodes\NemId\Core
+ * @author  Taken from the WAYF repo
  */
 class X509Helper extends Der
 {
-
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
-     * @return array
+     *
      * @throws \Exception
+     *
+     * @return array
      */
     public function generalName()
     {
@@ -48,51 +48,60 @@ class X509Helper extends Der
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param null $tag
-     * @return array
+     *
      * @throws \Exception
+     *
+     * @return array
      */
     public function generalNames($tag = null)
     {
-        $res = array();
+        $res = [];
         $this->beginsequence($tag);
         while ($this->in()) {
             $res[] = $this->generalName();
         }
         $this->end();
+
         return $res;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $name
+     *
      * @return string
      */
     public function nameAsString($name)
     {
         $rdnd = '';
         $res = '';
-        $abbvrs = array(
-            'countryName' => 'c',
-            'organizationName' => 'o',
-            'commonName' => 'cn',
-            'stateOrProvinceName' => 'state',
-            'localityName' => 'l',
+        $abbvrs = [
+            'countryName'            => 'c',
+            'organizationName'       => 'o',
+            'commonName'             => 'cn',
+            'stateOrProvinceName'    => 'state',
+            'localityName'           => 'l',
             'organizationalUnitName' => 'ou',
-            'domainComponent' => 'dc',
-        );
+            'domainComponent'        => 'dc',
+        ];
         foreach ($name as $rdn) {
             $mrdnd = '';
-            $r = "";
+            $r = '';
             foreach ($rdn as $type => $value) {
-                if (substr($type, -1) == '*') continue;
+                if (substr($type, -1) == '*') {
+                    continue;
+                }
                 $type = empty($abbvrs[$type]) ? $type : $abbvrs[$type];
-                $r .= $mrdnd . $type . '=' . $value;
+                $r .= $mrdnd.$type.'='.$value;
                 $mrdnd = '+';
             }
-            $res .= $rdnd . $r;
+            $res .= $rdnd.$r;
             $rdnd = ',';
         }
+
         return $res;
     }
 }

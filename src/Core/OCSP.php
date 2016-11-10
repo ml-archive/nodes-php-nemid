@@ -5,17 +5,17 @@ namespace Nodes\NemId\Core;
 /**
  * OCSP is able to encode OCSPRequests and decode OCSPResponses - just enough for NemID use
  * More or less 1:1 copy from WAYF Library
- * Class OCSP
+ * Class OCSP.
  *
  * @author  Taken from the WAYF repo
- * @package Nodes\NemId\Core
  */
 class OCSP extends X509
 {
-
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param array $certificationIds
+     *
      * @return string
      */
     public function request($certificationIds = [])
@@ -23,37 +23,44 @@ class OCSP extends X509
         $certificationIds_der = '';
         foreach ($certificationIds as $certificationId) {
             $certificationIds_der .= $this->sequence(
-                $this->sequence($this->s2oid("2.16.840.1.101.3.4.2.1")) # sha-256
-                . $this->octetstring($certificationId['issuerNameHash'])
-                . $this->octetstring($certificationId['issuerKeyHash'])
-                . $this->d2i($certificationId['serialNumber']));
+                $this->sequence($this->s2oid('2.16.840.1.101.3.4.2.1')) // sha-256
+                .$this->octetstring($certificationId['issuerNameHash'])
+                .$this->octetstring($certificationId['issuerKeyHash'])
+                .$this->d2i($certificationId['serialNumber']));
         }
+
         return $this->sequence($this->sequence($this->sequence($this->sequence($certificationIds_der))));
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $pdu
+     *
      * @return string
      */
     private function sequence($pdu)
     {
-        return "\x30" . self::len($pdu) . $pdu;
+        return "\x30".self::len($pdu).$pdu;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $s
+     *
      * @return string
      */
     protected function octetstring($s)
     {
-        return "\x04" . $this->len($s) . $s;
+        return "\x04".$this->len($s).$s;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $d
+     *
      * @return string
      */
     private function d2i($d)
@@ -63,31 +70,38 @@ class OCSP extends X509
             $der .= chr(bcmod($d, 256));
             $d = bcdiv($d, 256, 0);
         }
-        return "\x02" . $this->len($der) . strrev($der);
+
+        return "\x02".$this->len($der).strrev($der);
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $i
+     *
      * @return string
      */
     private function len($i)
     {
         $i = strlen($i);
-        if ($i <= 127)
+        if ($i <= 127) {
             $res = pack('C', $i);
-        elseif ($i <= 255)
+        } elseif ($i <= 255) {
             $res = pack('CC', 0x81, $i);
-        elseif ($i <= 65535)
+        } elseif ($i <= 65535) {
             $res = pack('Cn', 0x82, $i);
-        else
+        } else {
             $res = pack('CN', 0x84, $i);
+        }
+
         return $res;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $s
+     *
      * @return string
      */
     protected function s2oid($s)
@@ -105,26 +119,31 @@ class OCSP extends X509
             }
             $der .= strrev($derrev);
         }
-        return "\x06" . $this->len($der) . $der;
+
+        return "\x06".$this->len($der).$der;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param array $certificationId
+     *
      * @return array
      */
     public function certOcspID($certificationId = [])
     {
-        return array(
+        return [
             'issuerNameHash' => openssl_digest($certificationId['issuerName'], 'sha256', true),
-            'issuerKeyHash' => openssl_digest($certificationId['issuerKey'], 'sha256', true),
-            'serialNumber' => $certificationId['serialNumber'],
-        );
+            'issuerKeyHash'  => openssl_digest($certificationId['issuerKey'], 'sha256', true),
+            'serialNumber'   => $certificationId['serialNumber'],
+        ];
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $der
+     *
      * @return mixed
      */
     public function response($der)
@@ -136,16 +155,18 @@ class OCSP extends X509
             $ocspresponse['responseBytes'] = $this->responseBytes();
         }
         $this->end();
+
         return $ocspresponse;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return string
      */
     protected function responseStatus()
     {
-        $responsestatus = array(
+        $responsestatus = [
             'successful',
             'malformedRequest',
             'internalError',
@@ -153,12 +174,14 @@ class OCSP extends X509
             'NOT USED',
             'sigRequired',
             'unauthorized',
-        );
+        ];
+
         return $responsestatus[$this->next(10)];
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return array
      */
     protected function responseBytes()
@@ -176,7 +199,9 @@ class OCSP extends X509
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @param $der
+     *
      * @return array
      */
     protected function ocspBasic($der)
@@ -193,7 +218,7 @@ class OCSP extends X509
             $this->xtns->beginsequence();
             $x = new X509();
             while ($this->xtns->in()) {
-                $res['certs'][] = $x->certificate($this->xtns->der(null, true)); # get and continue past ...
+                $res['certs'][] = $x->certificate($this->xtns->der(null, true)); // get and continue past ...
             }
             $this->xtns->end();
         }
@@ -204,6 +229,7 @@ class OCSP extends X509
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return array
      */
     protected function tbsResponseData()
@@ -212,7 +238,7 @@ class OCSP extends X509
         $this->xtns->beginsequence();
         if ($this->xtns->peek() == 0) {
             $this->xtns->next(0);
-            $res['version'] = $this->xtns->next(2);;
+            $res['version'] = $this->xtns->next(2);
         }
         $choice = $this->xtns->peek();
         $this->xtns->next();
@@ -230,6 +256,7 @@ class OCSP extends X509
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return array
      */
     protected function singleResponses()
@@ -239,7 +266,7 @@ class OCSP extends X509
         while ($this->xtns->in()) {
             $this->xtns->beginsequence();
             $srres['certID'] = $this->certID();
-            $certstatuses = array('good', 'revoked', 'unknown');
+            $certstatuses = ['good', 'revoked', 'unknown'];
             $srres['certStatus'] = $certstatuses[$this->xtns->peek()];
             $this->xtns->next();
             $srres['thisUpdate'] = $this->xtns->time();
@@ -255,11 +282,13 @@ class OCSP extends X509
             $this->xtns->end();
         }
         $this->xtns->end();
+
         return $res;
     }
 
     /**
      * @author Casper Rasmussen <cr@nodes.dk>
+     *
      * @return array
      */
     public function certID()
