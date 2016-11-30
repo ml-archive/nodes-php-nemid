@@ -15,7 +15,21 @@ I'm sure it can be used easily without laravel also. Feel free to contribute to 
 This is a rewrite of an original library for an older version of the applet in java
 
 Original library can be found: https://code.google.com/p/nemid-php/ 
-    
+
+You must then modify your `composer.json` file and run `composer update` to include the latest version of the package in your project.
+
+```json
+"require": {
+    "nodes/push": "^2.0"
+}
+```
+
+Or you can run the composer require command from your terminal.
+
+```bash
+composer require nodes/push:^2.0
+```
+
 ## 🔧 Laravel Setup
 
 Setup service provider in `config/app.php`
