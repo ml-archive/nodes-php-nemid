@@ -56,7 +56,6 @@ class PidCprMatch
             'cpr'       => $cpr,
         ];
 
-
         $element = $xp->query('/method/request')
             ->item(0);
         $element->setAttribute('id', uniqid());

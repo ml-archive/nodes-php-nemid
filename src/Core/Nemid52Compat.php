@@ -82,7 +82,6 @@ class Nemid52Compat
         // Hash
         $digest = hash($signatureAlgorithm, $data, true);
 
-
         $temp = self::sequence(self::sequence(self::s2oid($oid)."\x05\x00").self::octetstring($digest));
         $psLen = $pInfo['bits'] / 8 - (strlen($temp) + 3);
 
