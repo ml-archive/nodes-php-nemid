@@ -52,20 +52,20 @@ php artisan vendor:publish --provider="Nodes\NemId\ServiceProvider" --force
 
 ## Certificates
 
-####Make sure you have bcmath installed
+#### Make sure you have bcmath installed
 ```
 sudo apt-get install php7.0-bcmath
 ```
 
 You got your p12 certificate now generate pem files, use following commands: 
 
-#####publicCertificate:
+##### publicCertificate:
 `openssl pkcs12 -in path.p12 -out certificate.pem -clcerts -nokeys`
 
-#####privateKey & privateKeyPassword
+##### privateKey & privateKeyPassword
 `openssl pkcs12 -in path.p12 -clcerts -out privateKey.pem`
 
-#####certifateAndPrivateKey & password (For PID/CPR match)
+##### certifateAndPrivateKey & password (For PID/CPR match)
 `openssl pkcs12 -in path.p12 -out certicateAndPrivateKey.pem -nocerts -nodes`     
 
 Now you have all the certificates needed 
