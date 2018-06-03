@@ -45,6 +45,15 @@ class Login
             $this->settings->getBaseUrl().'launcher/'.$this->settings->getUiMode().'/'.$this->timeStamp;
     }
 
+    function pem2der($pem_data) {
+        $begin = "CERTIFICATE-----";
+        $end   = "-----END";
+        $pem_data = substr($pem_data, strpos($pem_data, $begin)+strlen($begin));
+        $pem_data = substr($pem_data, 0, strpos($pem_data, $end));
+        $der = base64_decode($pem_data);
+        return $der;
+    }
+
     /**
      * Generate the params for Iframe.
      *
@@ -53,8 +62,7 @@ class Login
     private function generateParams()
     {
         // Trim certificate
-        $certificate = preg_replace('/(-----BEGIN CERTIFICATE-----|-----END CERTIFICATE-----|\s)/s', '',
-            $this->settings->getCertificate());
+        $certificate = $this->pem2der($this->settings->getCertificate());
 
         // Init start params
         $params = [
