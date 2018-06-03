@@ -3,6 +3,7 @@
 namespace Nodes\NemId\Login\CertificationCheck;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Nodes\NemId\Core\Nemid52Compat;
 use Nodes\NemId\Core\OCSP;
 use Nodes\NemId\Core\X509;
@@ -100,6 +101,9 @@ class CertificationCheck
         $this->simpleVerifyCertificateChain($certificateChain);
 
         // Check ocsp
+        dump('OCSP');
+        dump($certificateChain);
+        dump($this->settings);
         if ($this->settings['login']['checkOcsp']) {
             $this->checkOcsp($certificateChain);
         }
@@ -208,6 +212,8 @@ class CertificationCheck
         // first digest is for the root ...
         // check the root digest against a list of known root oces certificates
         $digest = hash('sha256', $certificateChain[0]->getCertificateDer());
+        dump($digest);
+        dump($this->settings);
         if (!in_array($digest, array_values($this->settings['login']['certificationDigests']))) {
             throw new InvalidCertificateException('Certificate chain not signed by any trustedroots');
         }
@@ -266,6 +272,10 @@ class CertificationCheck
         $issuer = array_pop($certificateChain);
         $ocspClient = new OCSP();
 
+        dump($issuer);
+        dump($certificate);
+        dump($certificate->getTbsCertificate());
+
         $certID = $ocspClient->certOcspID([
             'issuerName'   => $issuer->getTbsCertificate()['subject_der'],
             //remember to skip the first byte it is the number of unused bits and it is always 0 for keys and certificates
@@ -273,7 +283,11 @@ class CertificationCheck
             'serialNumber' => $certificate->getTbsCertificate()['serialNumber'],
         ]);
 
+        dump($certID);
+
         $ocsPreq = $ocspClient->request([$certID]);
+
+        dump($ocsPreq);
 
         $url = $certificate->getTbsCertificate()['extensions']['authorityInfoAccess']['extnValue']['ocsp'][0]['accessLocation']['uniformResourceIdentifier'];
 
@@ -288,18 +302,25 @@ class CertificationCheck
                 'body'            => $ocsPreq,
                 'connect_timeout' => 10,
             ];
+            dump($url);
+            dump($params);
 
-            // Set proxy
-            if ($proxy = $this->settings['nemid']['login']['proxy']) {
-                $params['proxy'] = $proxy;
-            }
 
             // Execute request
-            $response = $client->request('POST', $url, $params);
+            dump('before');
+            try {
+                $response = $client->request('POST', $url, $params);
+            } catch (GuzzleException $e) {
+                dump($e);
+            }
+            dump('after');
+            dump($response);
+            dump($response->getBody());
+            dump($response->getBody()->getContents());
             $ocspResponse = $ocspClient->response($response->getBody()->getContents());
 
             // TODO, in php 7 responseStatus is malformed
-            // $ocspResponse['responseStatus'] == 'malformedRequest'
+            $ocspResponse['responseStatus'] == 'malformedRequest';
         } catch (\Exception $e) {
             throw new InvalidCertificateException('Failed to check certificate: '.$e->getMessage());
         }
