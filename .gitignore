@@ -2,3 +2,4 @@
 /vendor/
 /testcertificates/
 !/testcertificates/.gitkeep
+.idea/
