@@ -117,8 +117,8 @@ class CertificationCheck
     private function certificateAsPem(Certificate $certificate)
     {
         return "-----BEGIN CERTIFICATE-----\n"
-               .chunk_split(base64_encode($certificate->getCertificateDer()))
-               .'-----END CERTIFICATE-----';
+            . chunk_split(base64_encode($certificate->getCertificateDer()))
+            . '-----END CERTIFICATE-----';
     }
 
     /**
@@ -161,14 +161,14 @@ class CertificationCheck
 
         // Check length
         if (count($certificateChain) != ($maxPathLength + 2)) {
-            throw new InvalidCertificateException('Length of certificate chain is not '.$maxPathLength);
+            throw new InvalidCertificateException('Length of certificate chain is not ' . $maxPathLength);
         }
 
         // Check key usage
         $leaf = $maxPathLength + 1;
         foreach ($keyUsages as $usage) {
             if (!($certificateChain[$leaf]->getTbsCertificate()['extensions']['keyUsage']['extnValue'][$usage])) {
-                throw new InvalidCertificateException('Certificate has not keyUsage: '.$usage);
+                throw new InvalidCertificateException('Certificate has not keyUsage: ' . $usage);
             }
         }
 
@@ -218,7 +218,7 @@ class CertificationCheck
      *
      * @author Casper Rasmussen <cr@nodes.dk>
      *
-     * @param \DomXPath                                                $xp
+     * @param \DomXPath $xp
      * @param \Nodes\NemId\Login\CertificationCheck\Models\Certificate $certificate
      *
      * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidSignatureException
@@ -229,7 +229,7 @@ class CertificationCheck
 
         $signedElement = $xp->query('ds:Object[@Id="ToBeSigned"]', $context)->item(0)->C14N();
         $digestValue = base64_decode($xp->query('ds:SignedInfo/ds:Reference/ds:DigestValue', $context)
-                                        ->item(0)->textContent);
+            ->item(0)->textContent);
 
         $signedInfo = $xp->query('ds:SignedInfo', $context)->item(0)->C14N();
         $signatureValue = base64_decode($xp->query('ds:SignatureValue', $context)->item(0)->textContent);
@@ -256,6 +256,7 @@ class CertificationCheck
      *
      * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidCertificateException
      * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidSignatureException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     protected function checkOcsp(array $certificateChain)
     {
@@ -267,9 +268,9 @@ class CertificationCheck
         $ocspClient = new OCSP();
 
         $certID = $ocspClient->certOcspID([
-            'issuerName'   => $issuer->getTbsCertificate()['subject_der'],
+            'issuerName' => $issuer->getTbsCertificate()['subject_der'],
             //remember to skip the first byte it is the number of unused bits and it is always 0 for keys and certificates
-            'issuerKey'    => substr($issuer->getTbsCertificate()['subjectPublicKeyInfo']['subjectPublicKey'], 1),
+            'issuerKey' => substr($issuer->getTbsCertificate()['subjectPublicKeyInfo']['subjectPublicKey'], 1),
             'serialNumber' => $certificate->getTbsCertificate()['serialNumber'],
         ]);
 
@@ -282,26 +283,18 @@ class CertificationCheck
         try {
             // Build params
             $params = [
-                'headers'         => [
-                    'Content-type: application/ocsp-request'."\r\n",
+                'headers' => [
+                    'Content-type: application/ocsp-request' . "\r\n",
                 ],
-                'body'            => $ocsPreq,
+                'body' => $ocsPreq,
                 'connect_timeout' => 10,
             ];
 
-            // Set proxy
-            if ($proxy = $this->settings['nemid']['login']['proxy']) {
-                $params['proxy'] = $proxy;
-            }
-
-            // Execute request
             $response = $client->request('POST', $url, $params);
             $ocspResponse = $ocspClient->response($response->getBody()->getContents());
 
-            // TODO, in php 7 responseStatus is malformed
-            // $ocspResponse['responseStatus'] == 'malformedRequest'
         } catch (\Exception $e) {
-            throw new InvalidCertificateException('Failed to check certificate: '.$e->getMessage());
+            throw new InvalidCertificateException('Failed to check certificate: ' . $e->getMessage());
         }
         // Check that the response was signed with the accompanying certificate
         $der = $ocspResponse['responseBytes']['BasicOCSPResponse']['tbsResponseData_der'];
@@ -380,7 +373,7 @@ class CertificationCheck
      *
      * @author Casper Rasmussen <cr@nodes.dk>
      *
-     * @param \DOMXPath              $xp
+     * @param \DOMXPath $xp
      * @param \Nodes\NemId\Core\X509 $x509
      *
      * @throws InvalidCertificateException

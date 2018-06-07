@@ -23,7 +23,8 @@ class Login
      * @author Casper Rasmussen <cr@nodes.dk>
      *
      * @param array $settings
-     * @param null  $mode
+     * @param null $mode
+     * @throws \Exception
      */
     public function __construct(array $settings, $mode = null)
     {
@@ -45,6 +46,15 @@ class Login
             $this->settings->getBaseUrl().'launcher/'.$this->settings->getUiMode().'/'.$this->timeStamp;
     }
 
+    private function pem2der($pem_data) {
+        $begin = "CERTIFICATE-----";
+        $end   = "-----END";
+        $pem_data = substr($pem_data, strpos($pem_data, $begin)+strlen($begin));
+        $pem_data = substr($pem_data, 0, strpos($pem_data, $end));
+        $der = $pem_data;
+        return $der;
+    }
+
     /**
      * Generate the params for Iframe.
      *
@@ -53,14 +63,14 @@ class Login
     private function generateParams()
     {
         // Trim certificate
-        $certificate = preg_replace('/(-----BEGIN CERTIFICATE-----|-----END CERTIFICATE-----|\s)/s', '',
-            $this->settings->getCertificate());
+        $certificate = $this->pem2der($this->settings->getCertificate());
 
         // Init start params
         $params = [
             'SP_CERT'    => $certificate,
             'CLIENTFLOW' => 'Oceslogin2',
-            'TIMESTAMP'  => $this->timeStamp,
+            'TIMESTAMP'  => ''.$this->timeStamp,
+            'LANGUAGE'   => 'DA'
         ];
 
         // Add origin if set
