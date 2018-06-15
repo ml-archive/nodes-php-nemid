@@ -21,6 +21,13 @@
     "require": {
         "guzzlehttp/guzzle": "~6.0"
     },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Nodes\\NemId\\ServiceProvider"
+            ]
+        }
+    },
     "autoload": {
         "psr-4": {
             "Nodes\\NemId\\": "src/"
