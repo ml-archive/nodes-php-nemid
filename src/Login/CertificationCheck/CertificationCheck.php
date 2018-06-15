@@ -279,6 +279,7 @@ class CertificationCheck
 
         // Init guzzle client
         $client = new Client();
+
         try {
             // Build params
             $params = [
