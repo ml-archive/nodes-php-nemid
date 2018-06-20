@@ -290,7 +290,7 @@ class CertificationCheck
             ];
 
             // Set proxy
-            if ($proxy = $this->settings['nemid']['login']['proxy']) {
+            if ($proxy = $this->settings['login']['proxy']) {
                 $params['proxy'] = $proxy;
             }
 
