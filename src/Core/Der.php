@@ -281,6 +281,7 @@ class Der extends Oids
             $extnID = $this->oid();
             $theext['critical'] = $this->peek(1);
             $theext['extnValue'] = $this->next(4);
+
             try {
                 if (method_exists($this, $extnID)) {
                     $theext['extnValue'] = call_user_func([$this, $extnID], $theext['extnValue']);
