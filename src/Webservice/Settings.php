@@ -2,6 +2,8 @@
 
 namespace Nodes\NemId\PidCprMatch;
 
+use Nodes\NemId\Core\Mode;
+
 /**
  * Class Settings.
  *
@@ -49,6 +51,11 @@ class Settings
      */
     public function __construct(array $settings, $mode = null)
     {
+        // Fallback to default mode
+        if (!$mode || !($mode instanceof Mode)) {
+            $mode = new Mode();
+        }
+
         // Retrieve settings
         $this->settings = $settings;
 
