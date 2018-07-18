@@ -16,6 +16,8 @@ This is a rewrite of an original library for an older version of the applet in j
 
 Original library can be found: https://code.google.com/p/nemid-php/ 
 
+**To become a nemid partner please follow this [Link](https://www.nets.eu/dk-da/l%C3%B8sninger/nemid/nemid-tjenesteudbyder/Pages/s%C3%A5dan-bliver-du-nemid-tjenesteudbyder.aspx)**
+
 You must then modify your `composer.json` file and run `composer update` to include the latest version of the package in your project.
 
 ```json
