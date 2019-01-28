@@ -106,7 +106,7 @@ Now validate the certificates and extract name and PID from it by initialize a C
 
 `$certificate->getSubject()->getPid();`
 
-#PID/CPR match integration
+## PID/CPR match integration
 Initialize a PidCprMatch object and call the function with pid and cpr params.
 
 `$pidCprMatch = new PidCprMatch(config('nodes.nemid'));`
