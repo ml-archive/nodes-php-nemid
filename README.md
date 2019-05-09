@@ -5,16 +5,16 @@ A PHP Laravel library for using the Danish NemID for authenticating a user.
 I'm sure it can be used easily without laravel also. Feel free to contribute to improvements
 
 ![image](https://cloud.githubusercontent.com/assets/1279756/20196240/18e4a2b8-a79a-11e6-832b-36933da588e3.png)
- 
-### The library supports: 
+
+### The library supports:
   - Preparing the parameters for the applet
   - Validate the returned signature and the certificate chain
   - Extract Name and PID
   - Matching PID to CPR SOAP webservice
-    
+
 This is a rewrite of an original library for an older version of the applet in java
 
-Original library can be found: https://code.google.com/p/nemid-php/ 
+Original library can be found: https://code.google.com/p/nemid-php/
 
 **To become a nemid partner please follow this [Link](https://www.nets.eu/dk-da/l%C3%B8sninger/nemid/nemid-tjenesteudbyder/Pages/s%C3%A5dan-bliver-du-nemid-tjenesteudbyder.aspx)**
 
@@ -59,18 +59,22 @@ php artisan vendor:publish --provider="Nodes\NemId\ServiceProvider" --force
 sudo apt-get install php7.0-bcmath
 ```
 
-You got your p12 certificate now generate pem files, use following commands: 
+You got your p12 certificate now generate pem files, use following commands:
 
 ##### publicCertificate:
-`openssl pkcs12 -in path.p12 -out certificate.pem -clcerts -nokeys`
+`openssl pkcs12 -nodes -in path.p12 -out certificate.pem -clcerts -nokeys`
 
 ##### privateKey & privateKeyPassword
-`openssl pkcs12 -in path.p12 -clcerts -out privateKey.pem`
+`openssl pkcs12 -nodes -in path.p12 -clcerts -out privateKey.pem`
 
 ##### certifateAndPrivateKey & password (For PID/CPR match)
-`openssl pkcs12 -in path.p12 -out certicateAndPrivateKey.pem -nocerts -nodes`     
+`openssl pkcs12 -nodes -in path.p12 -out certificateAndPrivateKey.pem -nocerts`
 
-Now you have all the certificates needed 
+Now you have all the certificates needed -
+
+**NB: In case your .pem files are generated with `Bag Attributes` these lines can simply be deleted. Only the `BEGIN XXX` and `END XXX` are relevant.**
+
+**NB: Make sure no files are encrypted by using the `-nodes` flag on your `openssl`commands**
 
 ##### Copy the config file to htdocs and fill settings
 Look in the config file for more help
@@ -88,7 +92,7 @@ Setup a html document with the iframe url, js with param data and a form for cal
 
 `$login->getParams();`
 
-The iframe will now submit the response to the form 
+The iframe will now submit the response to the form
 
 The submitted data is base64 encoded, besides that all errors comes as string while successfully logins are xml documents
 
@@ -122,6 +126,6 @@ A response object will be returned. The object has functions to to check match a
  - The name `Pseudonym` or `Pseudonym Pseudonym` will be used for version 1 of nemid users, which have not set their name afterwards
 
 Enjoy
- 
+
 
 
