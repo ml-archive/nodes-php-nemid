@@ -62,19 +62,25 @@ sudo apt-get install php7.0-bcmath
 You got your p12 certificate now generate pem files, use following commands:
 
 ##### publicCertificate:
-`openssl pkcs12 -nodes -in path.p12 -out certificate.pem -clcerts -nokeys`
+`openssl pkcs12 -in path.p12 -out certificate.pem -clcerts -nokeys`
+
+**NB: Remove the initial lines with `Bag Attributes` if present.**
+
+Only the `-----BEGIN CERTIFICATE-----`, the base64 encoded certificate and `-----END CERTIFICATE-----` are relevant.
 
 ##### privateKey & privateKeyPassword
-`openssl pkcs12 -nodes -in path.p12 -clcerts -out privateKey.pem`
+`openssl pkcs12 -in path.p12 -clcerts -out privateKey.pem`
+
+Openssl will prompt you for a `PEM pass phrase` that will have to be set in your `nemid.php` configuration.
 
 ##### certifateAndPrivateKey & password (For PID/CPR match)
-`openssl pkcs12 -nodes -in path.p12 -out certificateAndPrivateKey.pem -nocerts`
+`openssl pkcs12 -in path.p12 -out certificateAndPrivateKey.pem -chain`
+
+The `-nodes` flag disables encryption and password protection of your certificates (it has nothing to do with Nodes).
+
+If left out Openssl will prompt you for a `PEM pass phrase` that will have to be set in your `nemid.php` configuration.
 
 Now you have all the certificates needed -
-
-**NB: In case your .pem files are generated with `Bag Attributes` these lines can simply be deleted. Only the `BEGIN XXX` and `END XXX` are relevant.**
-
-**NB: Make sure no files are encrypted by using the `-nodes` flag on your `openssl`commands**
 
 ##### Copy the config file to htdocs and fill settings
 Look in the config file for more help
