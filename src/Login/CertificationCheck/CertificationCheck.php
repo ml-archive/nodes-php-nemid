@@ -66,7 +66,7 @@ class CertificationCheck
      *
      * @author Casper Rasmussen <cr@nodes.dk>
      *
-     * @param   $xml
+     * @param $xml
      *
      * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidCertificateException
      * @throws \Nodes\NemId\Login\CertificationCheck\Exceptions\InvalidSignatureException
