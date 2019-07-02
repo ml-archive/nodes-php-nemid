@@ -59,6 +59,8 @@ php artisan vendor:publish --provider="Nodes\NemId\ServiceProvider" --force
 sudo apt-get install php7.0-bcmath
 ```
 
+If your p12 file is password protected and the password holds special characters, see [this stack overflow post](https://stackoverflow.com/questions/17404578/c-sharp-x509certificate2-unsupported-password-chars)
+
 You got your p12 certificate now generate pem files, use following commands:
 
 ##### publicCertificate:
