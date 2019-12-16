@@ -28,7 +28,7 @@ class Login
     public function __construct(array $settings, $mode = null)
     {
         $this->settings = new Settings($settings, $mode);
-        $this->timeStamp = (int) round(microtime(true) * 1000);
+        $this->timeStamp = (string) round(microtime(true) * 1000);
 
         $this->generateIFrameUrl();
         $this->generateParams();
