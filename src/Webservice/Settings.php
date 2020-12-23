@@ -1,6 +1,6 @@
 <?php
 
-namespace Nodes\NemId\PidCprMatch;
+namespace Nodes\NemId\Webservice;
 
 use Nodes\NemId\Core\Mode;
 
