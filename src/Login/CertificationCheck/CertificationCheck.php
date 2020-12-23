@@ -41,8 +41,10 @@ class CertificationCheck
      *
      * @return bool
      */
-    public static function isXml($xml)
+    public static function isXml(string $xml)
     {
+        if ($xml[0] !== '<') return false;
+
         try {
             $document = new \DOMDocument();
             $document->loadXML($xml);
