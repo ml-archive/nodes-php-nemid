@@ -43,7 +43,9 @@ class CertificationCheck
      */
     public static function isXml(string $xml)
     {
-        if ($xml[0] !== '<') return false;
+        if ($xml[0] !== '<') {
+            return false;
+        }
 
         try {
             $document = new \DOMDocument();
