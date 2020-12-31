@@ -23,6 +23,7 @@ return [
             'privateKeyPassword'  => '', // Password for the private key
             'privateKeyLocation'  => 'privateKey.pem', // Location for private key
             'certificateLocation' => 'publicCert.pem', // Location for public certificate
+            'language'            => 'da', // Supported languages: da (Danish, default), en (English), kl (Greenlandic)
         ],
         'testSettings' => [
             'baseUrl'             => 'https://appletk.danid.dk/', // Official url for testing environment
@@ -32,6 +33,7 @@ return [
             'privateKeyPassword'  => '', // Password for the private key
             'privateKeyLocation'  => 'testPrivateKey.pem', // Location for private key
             'certificateLocation' => 'testPublicCert.pem', // Location for public certificate
+            'language'            => 'da', // Supported languages: da (Danish, default), en (English), kl (Greenlandic)            
         ],
 
         // Check for certificate matching after login
