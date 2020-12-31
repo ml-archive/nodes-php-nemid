@@ -53,8 +53,11 @@ class Login
     private function generateParams()
     {
         // Trim certificate
-        $certificate = preg_replace('/(-----BEGIN CERTIFICATE-----|-----END CERTIFICATE-----|\s)/s', '',
-            $this->settings->getCertificate());
+        $certificate = preg_replace(
+            '/(-----BEGIN CERTIFICATE-----|-----END CERTIFICATE-----|\s)/s',
+            '',
+            $this->settings->getCertificate()
+        );
 
         // Init start params
         $params = [
