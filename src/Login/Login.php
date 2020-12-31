@@ -61,6 +61,7 @@ class Login
             'SP_CERT'    => $certificate,
             'CLIENTFLOW' => 'Oceslogin2',
             'TIMESTAMP'  => $this->timeStamp,
+            'LANGUAGE'   => $this->settings->getLanguage(),
         ];
 
         // Add origin if set
@@ -140,5 +141,16 @@ class Login
     public function getSettings()
     {
         return $this->settings;
+    }
+
+    /**
+     * @author Tim Johannessen <twj@smbsolutions.dk>
+     *
+     * @param string $language
+     */
+    public function setLanguage(string $language)
+    {
+        $this->settings->setLanguage($language);
+        $this->generateParams();
     }
 }

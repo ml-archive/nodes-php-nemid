@@ -24,6 +24,7 @@ class Settings
     protected $privateKey;
     protected $privateKeyPassword;
     protected $certificate;
+    protected $language;
 
     /**
      * var boolean.
@@ -80,6 +81,7 @@ class Settings
         $this->privateKeyPassword = $settings['privateKeyPassword'];
         $this->privateKey = file_get_contents($settings['privateKeyLocation']);
         $this->certificate = file_get_contents($settings['certificateLocation']);
+        $this->language = $settings['language'];
     }
 
     /**
@@ -170,5 +172,25 @@ class Settings
     public function showCancelBtn()
     {
         return $this->showCancelBtn;
+    }
+
+    /**
+     * @author Tim Johannessen <twj@smbsolutions.dk>
+     *
+     * @return string
+     */
+    public function getLanguage()
+    {
+        return $this->language;
+    }
+
+    /**
+     * @author Tim Johannessen <twj@smbsolutions.dk>
+     *
+     * @param string $language
+     */
+    public function setLanguage(string $language)
+    {
+        $this->language = $language;
     }
 }
