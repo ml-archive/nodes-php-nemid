@@ -81,7 +81,7 @@ class Settings
         $this->privateKeyPassword = $settings['privateKeyPassword'];
         $this->privateKey = file_get_contents($settings['privateKeyLocation']);
         $this->certificate = file_get_contents($settings['certificateLocation']);
-        $this->language = $settings['language'];
+        $this->language = $settings['language'] ?: 'da';
     }
 
     /**
