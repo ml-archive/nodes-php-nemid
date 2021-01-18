@@ -284,7 +284,7 @@ class CertificationCheck
             // Build params
             $params = [
                 'headers'         => [
-                    'Content-type: application/ocsp-request'."\r\n",
+                    'Content-type: application/ocsp-request',
                 ],
                 'body'            => $ocsPreq,
                 'connect_timeout' => 10,
