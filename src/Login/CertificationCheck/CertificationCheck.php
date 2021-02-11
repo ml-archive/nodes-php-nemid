@@ -43,15 +43,11 @@ class CertificationCheck
      */
     public static function isXml(string $xml)
     {
-        if ($xml[0] !== '<') {
-            return false;
-        }
-
         try {
             $document = new \DOMDocument();
-            $document->loadXML($xml);
+            $result = $document->loadXML($xml, LIBXML_NOWARNING | LIBXML_NOERROR);
 
-            return true;
+            return (bool) $result;
         } catch (\Exception $e) {
             return false;
         }
