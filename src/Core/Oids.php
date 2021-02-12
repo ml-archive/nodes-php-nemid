@@ -1132,7 +1132,7 @@ class Oids
         '1.3.14.3.2.26*'                   => 'sha1',
         '1.3.14.3.2.27*'                   => 'dsaWithSHA1',
         '1.3.14.3.2.28*'                   => 'dsaWithCommonSHA1',
-//        '1.3.14.3.2.29*' => 'sha-1WithRSAEncryption',
+        //        '1.3.14.3.2.29*' => 'sha-1WithRSAEncryption',
         '1.3.14.3.2.29*'                    => 'sha1WithRSAEncryption',
         '1.3.14.3.3.1*'                     => 'simple-strong-auth-mechanism',
         '1.3.14.7.2.1.1*'                   => 'ElGamal',
