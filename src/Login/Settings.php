@@ -73,6 +73,11 @@ class Settings
         // Subtract settings for mode
         $settings = $this->settings['login'][$key];
 
+        // prevent update errors
+        if (!isset($settings['language'])) {
+            $settings['language'] = 'da';
+        }
+
         // Init variables
         $this->baseUrl = $settings['baseUrl'];
         $this->uiMode = $settings['uiMode'];
