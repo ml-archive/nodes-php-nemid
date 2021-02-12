@@ -80,8 +80,11 @@ class Der extends Oids
         print_r("len: {$len}\n");
         print_r("class:   {$class}\n");
         print_r("tag  :   {$tag}\n");
-        print_r(chunk_split(bin2hex(substr($this->buffer, $this->i, min(32, strlen($this->buffer) - $this->i)))."\n", 2,
-            ':'));
+        print_r(chunk_split(
+            bin2hex(substr($this->buffer, $this->i, min(32, strlen($this->buffer) - $this->i)))."\n",
+            2,
+            ':'
+        ));
         print_r("---\n");
     }
 
