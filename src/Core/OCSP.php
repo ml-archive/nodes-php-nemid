@@ -26,7 +26,8 @@ class OCSP extends X509
                 $this->sequence($this->s2oid('2.16.840.1.101.3.4.2.1')) // sha-256
                 .$this->octetstring($certificationId['issuerNameHash'])
                 .$this->octetstring($certificationId['issuerKeyHash'])
-                .$this->d2i($certificationId['serialNumber']));
+                .$this->d2i($certificationId['serialNumber'])
+            );
         }
 
         return $this->sequence($this->sequence($this->sequence($this->sequence($certificationIds_der))));
