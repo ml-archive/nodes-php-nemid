@@ -53,14 +53,18 @@ class Login
     private function generateParams()
     {
         // Trim certificate
-        $certificate = preg_replace('/(-----BEGIN CERTIFICATE-----|-----END CERTIFICATE-----|\s)/s', '',
-            $this->settings->getCertificate());
+        $certificate = preg_replace(
+            '/(-----BEGIN CERTIFICATE-----|-----END CERTIFICATE-----|\s)/s',
+            '',
+            $this->settings->getCertificate()
+        );
 
         // Init start params
         $params = [
             'SP_CERT'    => $certificate,
             'CLIENTFLOW' => 'Oceslogin2',
             'TIMESTAMP'  => $this->timeStamp,
+            'LANGUAGE'   => $this->settings->getLanguage(),
         ];
 
         // Add origin if set
@@ -140,5 +144,16 @@ class Login
     public function getSettings()
     {
         return $this->settings;
+    }
+
+    /**
+     * @author Tim Johannessen <twj@smbsolutions.dk>
+     *
+     * @param string $language
+     */
+    public function setLanguage(string $language)
+    {
+        $this->settings->setLanguage($language);
+        $this->generateParams();
     }
 }

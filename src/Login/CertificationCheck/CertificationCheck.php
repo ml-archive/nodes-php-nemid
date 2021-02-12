@@ -41,13 +41,13 @@ class CertificationCheck
      *
      * @return bool
      */
-    public static function isXml($xml)
+    public static function isXml(string $xml)
     {
         try {
             $document = new \DOMDocument();
-            $document->loadXML($xml);
+            $result = $document->loadXML($xml, LIBXML_NOWARNING | LIBXML_NOERROR);
 
-            return true;
+            return (bool) $result;
         } catch (\Exception $e) {
             return false;
         }

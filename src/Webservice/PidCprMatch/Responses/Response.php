@@ -1,6 +1,6 @@
 <?php
 
-namespace Nodes\NemId\PidCprMatch\Responses;
+namespace Nodes\NemId\Webservice\PidCprMatch\Responses;
 
 /**
  * Class Response.

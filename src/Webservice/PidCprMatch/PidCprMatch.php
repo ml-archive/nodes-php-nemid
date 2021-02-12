@@ -1,9 +1,10 @@
 <?php
 
-namespace Nodes\NemId\PidCprMatch;
+namespace Nodes\NemId\Webservice\PidCprMatch;
 
 use GuzzleHttp\Client;
-use Nodes\NemId\PidCprMatch\Responses\Response;
+use Nodes\NemId\Webservice\PidCprMatch\Responses\Response;
+use Nodes\NemId\Webservice\Settings;
 
 /**
  * Class PidCprMatch.
